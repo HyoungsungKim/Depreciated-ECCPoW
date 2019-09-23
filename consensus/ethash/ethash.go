@@ -40,6 +40,15 @@ import (
 	"github.com/Onther-Tech/go-ethereum/metrics"
 	"github.com/Onther-Tech/go-ethereum/rpc"
 	mmap "github.com/edsrzf/mmap-go"
+<<<<<<< HEAD
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 	"github.com/hashicorp/golang-lru/simplelru"
 )
 

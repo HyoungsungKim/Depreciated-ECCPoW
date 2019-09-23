@@ -35,6 +35,7 @@ import (
 	"strings"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/cmd/utils"
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/console"
@@ -45,6 +46,18 @@ import (
 	"github.com/Onther-Tech/go-ethereum/p2p/nat"
 	"github.com/Onther-Tech/go-ethereum/whisper/mailserver"
 	whisper "github.com/Onther-Tech/go-ethereum/whisper/whisperv6"
+=======
+	"github.com/ethereum/go-ethereum/cmd/utils"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/console"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/nat"
+	"github.com/ethereum/go-ethereum/whisper/mailserver"
+	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
+>>>>>>> upstream/master
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -203,7 +216,11 @@ func initialize() {
 		if len(*argEnode) == 0 {
 			argEnode = scanLineA("Please enter the peer's enode: ")
 		}
+<<<<<<< HEAD
 		peer := enode.MustParseV4(*argEnode)
+=======
+		peer := enode.MustParse(*argEnode)
+>>>>>>> upstream/master
 		peers = append(peers, peer)
 	}
 
@@ -747,9 +764,13 @@ func requestExpiredMessagesLoop() {
 }
 
 func extractIDFromEnode(s string) []byte {
+<<<<<<< HEAD
 	n, err := enode.ParseV4(s)
+=======
+	n, err := enode.Parse(enode.ValidSchemes, s)
+>>>>>>> upstream/master
 	if err != nil {
-		utils.Fatalf("Failed to parse enode: %s", err)
+		utils.Fatalf("Failed to parse node: %s", err)
 	}
 	return n.ID().Bytes()
 }

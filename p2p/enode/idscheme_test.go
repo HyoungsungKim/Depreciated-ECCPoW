@@ -23,9 +23,15 @@ import (
 	"math/big"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/p2p/enr"
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/ethereum/go-ethereum/rlp"
+>>>>>>> upstream/master
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -20,9 +20,15 @@ import (
 	"math/big"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/core/state"
 	"github.com/Onther-Tech/go-ethereum/params"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/params"
+>>>>>>> upstream/master
 )
 
 type dummyContractRef struct {

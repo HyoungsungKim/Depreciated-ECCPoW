@@ -18,14 +18,21 @@ package vm
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/common/math"
 	"github.com/Onther-Tech/go-ethereum/core/types"
 	"github.com/Onther-Tech/go-ethereum/crypto/sha3"
 	"github.com/Onther-Tech/go-ethereum/params"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params"
+	"golang.org/x/crypto/sha3"
+>>>>>>> upstream/master
 )
 
 var (
@@ -35,6 +42,7 @@ var (
 	errReturnDataOutOfBounds = errors.New("evm: return data out of bounds")
 	errExecutionReverted     = errors.New("evm: execution reverted")
 	errMaxCodeSizeExceeded   = errors.New("evm: max code size exceeded")
+	errInvalidJump           = errors.New("evm: invalid jump destination")
 )
 
 func opAdd(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
@@ -387,7 +395,11 @@ func opSha3(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 	data := memory.Get(offset.Int64(), size.Int64())
 
 	if interpreter.hasher == nil {
+<<<<<<< HEAD
 		interpreter.hasher = sha3.NewKeccak256().(keccakState)
+=======
+		interpreter.hasher = sha3.NewLegacyKeccak256().(keccakState)
+>>>>>>> upstream/master
 	} else {
 		interpreter.hasher.Reset()
 	}
@@ -405,7 +417,11 @@ func opSha3(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 }
 
 func opAddress(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+<<<<<<< HEAD
 	stack.push(contract.Address().Big())
+=======
+	stack.push(interpreter.intPool.get().SetBytes(contract.Address().Bytes()))
+>>>>>>> upstream/master
 	return nil, nil
 }
 
@@ -416,12 +432,20 @@ func opBalance(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 }
 
 func opOrigin(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+<<<<<<< HEAD
 	stack.push(interpreter.evm.Origin.Big())
+=======
+	stack.push(interpreter.intPool.get().SetBytes(interpreter.evm.Origin.Bytes()))
+>>>>>>> upstream/master
 	return nil, nil
 }
 
 func opCaller(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+<<<<<<< HEAD
 	stack.push(contract.Caller().Big())
+=======
+	stack.push(interpreter.intPool.get().SetBytes(contract.Caller().Bytes()))
+>>>>>>> upstream/master
 	return nil, nil
 }
 
@@ -467,7 +491,11 @@ func opReturnDataCopy(pc *uint64, interpreter *EVMInterpreter, contract *Contrac
 	)
 	defer interpreter.intPool.put(memOffset, dataOffset, length, end)
 
+<<<<<<< HEAD
 	if end.BitLen() > 64 || uint64(len(interpreter.returnData)) < end.Uint64() {
+=======
+	if !end.IsUint64() || uint64(len(interpreter.returnData)) < end.Uint64() {
+>>>>>>> upstream/master
 		return nil, errReturnDataOutOfBounds
 	}
 	memory.Set(memOffset.Uint64(), length.Uint64(), interpreter.returnData[dataOffset.Uint64():end.Uint64()])
@@ -513,6 +541,7 @@ func opExtCodeCopy(pc *uint64, interpreter *EVMInterpreter, contract *Contract, 
 	memory.Set(memOffset.Uint64(), length.Uint64(), codeCopy)
 
 	interpreter.intPool.put(memOffset, codeOffset, length)
+<<<<<<< HEAD
 	return nil, nil
 }
 
@@ -558,6 +587,53 @@ func opGasprice(pc *uint64, interpreter *EVMInterpreter, contract *Contract, mem
 	return nil, nil
 }
 
+=======
+	return nil, nil
+}
+
+// opExtCodeHash returns the code hash of a specified account.
+// There are several cases when the function is called, while we can relay everything
+// to `state.GetCodeHash` function to ensure the correctness.
+//   (1) Caller tries to get the code hash of a normal contract account, state
+// should return the relative code hash and set it as the result.
+//
+//   (2) Caller tries to get the code hash of a non-existent account, state should
+// return common.Hash{} and zero will be set as the result.
+//
+//   (3) Caller tries to get the code hash for an account without contract code,
+// state should return emptyCodeHash(0xc5d246...) as the result.
+//
+//   (4) Caller tries to get the code hash of a precompiled account, the result
+// should be zero or emptyCodeHash.
+//
+// It is worth noting that in order to avoid unnecessary create and clean,
+// all precompile accounts on mainnet have been transferred 1 wei, so the return
+// here should be emptyCodeHash.
+// If the precompile account is not transferred any amount on a private or
+// customized chain, the return value will be zero.
+//
+//   (5) Caller tries to get the code hash for an account which is marked as suicided
+// in the current transaction, the code hash of this account should be returned.
+//
+//   (6) Caller tries to get the code hash for an account which is marked as deleted,
+// this account should be regarded as a non-existent account and zero should be returned.
+func opExtCodeHash(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	slot := stack.peek()
+	address := common.BigToAddress(slot)
+	if interpreter.evm.StateDB.Empty(address) {
+		slot.SetUint64(0)
+	} else {
+		slot.SetBytes(interpreter.evm.StateDB.GetCodeHash(address).Bytes())
+	}
+	return nil, nil
+}
+
+func opGasprice(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	stack.push(interpreter.intPool.get().Set(interpreter.evm.GasPrice))
+	return nil, nil
+}
+
+>>>>>>> upstream/master
 func opBlockhash(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	num := stack.pop()
 
@@ -572,7 +648,11 @@ func opBlockhash(pc *uint64, interpreter *EVMInterpreter, contract *Contract, me
 }
 
 func opCoinbase(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+<<<<<<< HEAD
 	stack.push(interpreter.evm.Coinbase.Big())
+=======
+	stack.push(interpreter.intPool.get().SetBytes(interpreter.evm.Coinbase.Bytes()))
+>>>>>>> upstream/master
 	return nil, nil
 }
 
@@ -645,8 +725,12 @@ func opSstore(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 func opJump(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	pos := stack.pop()
 	if !contract.validJumpdest(pos) {
+<<<<<<< HEAD
 		nop := contract.GetOp(pos.Uint64())
 		return nil, fmt.Errorf("invalid jump destination (%v) %v", nop, pos)
+=======
+		return nil, errInvalidJump
+>>>>>>> upstream/master
 	}
 	*pc = pos.Uint64()
 
@@ -658,8 +742,12 @@ func opJumpi(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory
 	pos, cond := stack.pop(), stack.pop()
 	if cond.Sign() != 0 {
 		if !contract.validJumpdest(pos) {
+<<<<<<< HEAD
 			nop := contract.GetOp(pos.Uint64())
 			return nil, fmt.Errorf("invalid jump destination (%v) %v", nop, pos)
+=======
+			return nil, errInvalidJump
+>>>>>>> upstream/master
 		}
 		*pc = pos.Uint64()
 	} else {
@@ -711,7 +799,11 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 	} else if suberr != nil && suberr != ErrCodeStoreOutOfGas {
 		stack.push(interpreter.intPool.getZero())
 	} else {
+<<<<<<< HEAD
 		stack.push(addr.Big())
+=======
+		stack.push(interpreter.intPool.get().SetBytes(addr.Bytes()))
+>>>>>>> upstream/master
 	}
 	contract.Gas += returnGas
 	interpreter.intPool.put(value, offset, size)
@@ -739,7 +831,7 @@ func opCreate2(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 	if suberr != nil {
 		stack.push(interpreter.intPool.getZero())
 	} else {
-		stack.push(addr.Big())
+		stack.push(interpreter.intPool.get().SetBytes(addr.Bytes()))
 	}
 	contract.Gas += returnGas
 	interpreter.intPool.put(endowment, offset, size, salt)
@@ -910,6 +1002,21 @@ func makeLog(size int) executionFunc {
 		interpreter.intPool.put(mStart, mSize)
 		return nil, nil
 	}
+}
+
+// opPush1 is a specialized version of pushN
+func opPush1(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
+	var (
+		codeLen = uint64(len(contract.Code))
+		integer = interpreter.intPool.get()
+	)
+	*pc += 1
+	if *pc < codeLen {
+		stack.push(integer.SetUint64(uint64(contract.Code[*pc])))
+	} else {
+		stack.push(integer.SetUint64(0))
+	}
+	return nil, nil
 }
 
 // make push instruction function

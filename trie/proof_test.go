@@ -23,9 +23,15 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/ethdb"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+>>>>>>> upstream/master
 )
 
 func init() {
@@ -34,18 +40,32 @@ func init() {
 
 // makeProvers creates Merkle trie provers based on different implementations to
 // test all variations.
+<<<<<<< HEAD
 func makeProvers(trie *Trie) []func(key []byte) *ethdb.MemDatabase {
 	var provers []func(key []byte) *ethdb.MemDatabase
 
 	// Create a direct trie based Merkle prover
 	provers = append(provers, func(key []byte) *ethdb.MemDatabase {
 		proof := ethdb.NewMemDatabase()
+=======
+func makeProvers(trie *Trie) []func(key []byte) *memorydb.Database {
+	var provers []func(key []byte) *memorydb.Database
+
+	// Create a direct trie based Merkle prover
+	provers = append(provers, func(key []byte) *memorydb.Database {
+		proof := memorydb.New()
+>>>>>>> upstream/master
 		trie.Prove(key, 0, proof)
 		return proof
 	})
 	// Create a leaf iterator based Merkle prover
+<<<<<<< HEAD
 	provers = append(provers, func(key []byte) *ethdb.MemDatabase {
 		proof := ethdb.NewMemDatabase()
+=======
+	provers = append(provers, func(key []byte) *memorydb.Database {
+		proof := memorydb.New()
+>>>>>>> upstream/master
 		if it := NewIterator(trie.NodeIterator(key)); it.Next() && bytes.Equal(key, it.Key) {
 			for _, p := range it.Prove() {
 				proof.Put(crypto.Keccak256(p), p)
@@ -106,9 +126,20 @@ func TestBadProof(t *testing.T) {
 			if proof == nil {
 				t.Fatalf("prover %d: nil proof", i)
 			}
+<<<<<<< HEAD
 			key := proof.Keys()[mrand.Intn(proof.Len())]
 			val, _ := proof.Get(key)
 			proof.Delete(key)
+=======
+			it := proof.NewIterator()
+			for i, d := 0, mrand.Intn(proof.Len()); i <= d; i++ {
+				it.Next()
+			}
+			key := it.Key()
+			val, _ := proof.Get(key)
+			proof.Delete(key)
+			it.Release()
+>>>>>>> upstream/master
 
 			mutateByte(val)
 			proof.Put(crypto.Keccak256(val), val)
@@ -127,7 +158,11 @@ func TestMissingKeyProof(t *testing.T) {
 	updateString(trie, "k", "v")
 
 	for i, key := range []string{"a", "j", "l", "z"} {
+<<<<<<< HEAD
 		proof := ethdb.NewMemDatabase()
+=======
+		proof := memorydb.New()
+>>>>>>> upstream/master
 		trie.Prove([]byte(key), 0, proof)
 
 		if proof.Len() != 1 {
@@ -164,8 +199,13 @@ func BenchmarkProve(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		kv := vals[keys[i%len(keys)]]
+<<<<<<< HEAD
 		proofs := ethdb.NewMemDatabase()
 		if trie.Prove(kv.k, 0, proofs); len(proofs.Keys()) == 0 {
+=======
+		proofs := memorydb.New()
+		if trie.Prove(kv.k, 0, proofs); proofs.Len() == 0 {
+>>>>>>> upstream/master
 			b.Fatalf("zero length proof for %x", kv.k)
 		}
 	}
@@ -175,10 +215,14 @@ func BenchmarkVerifyProof(b *testing.B) {
 	trie, vals := randomTrie(100)
 	root := trie.Hash()
 	var keys []string
-	var proofs []*ethdb.MemDatabase
+	var proofs []*memorydb.Database
 	for k := range vals {
 		keys = append(keys, k)
+<<<<<<< HEAD
 		proof := ethdb.NewMemDatabase()
+=======
+		proof := memorydb.New()
+>>>>>>> upstream/master
 		trie.Prove([]byte(k), 0, proof)
 		proofs = append(proofs, proof)
 	}

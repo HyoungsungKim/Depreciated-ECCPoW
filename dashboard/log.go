@@ -26,7 +26,11 @@ import (
 	"sort"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
+=======
+	"github.com/ethereum/go-ethereum/log"
+>>>>>>> upstream/master
 	"github.com/mohae/deepcopy"
 	"github.com/rjeczalik/notify"
 )
@@ -94,6 +98,7 @@ func (db *Dashboard) handleLogRequest(r *LogsRequest, c *client) {
 		// The last file is continuously updated, and its chunks are streamed,
 		// so in order to avoid log record duplication on the client side, it is
 		// handled differently. Its actual content is always saved in the history.
+<<<<<<< HEAD
 		db.lock.Lock()
 		if db.history.Logs != nil {
 			c.msg <- &Message{
@@ -101,6 +106,15 @@ func (db *Dashboard) handleLogRequest(r *LogsRequest, c *client) {
 			}
 		}
 		db.lock.Unlock()
+=======
+		db.logLock.RLock()
+		if db.history.Logs != nil {
+			c.msg <- &Message{
+				Logs: deepcopy.Copy(db.history.Logs).(*LogsMessage),
+			}
+		}
+		db.logLock.RUnlock()
+>>>>>>> upstream/master
 		return
 	case fileNames[idx] == r.Name:
 		idx++
@@ -174,7 +188,11 @@ func (db *Dashboard) streamLogs() {
 		log.Warn("Problem with file", "name", opened.Name(), "err", err)
 		return
 	}
+<<<<<<< HEAD
 	db.lock.Lock()
+=======
+	db.logLock.Lock()
+>>>>>>> upstream/master
 	db.history.Logs = &LogsMessage{
 		Source: &LogFile{
 			Name: fi.Name(),
@@ -182,7 +200,11 @@ func (db *Dashboard) streamLogs() {
 		},
 		Chunk: emptyChunk,
 	}
+<<<<<<< HEAD
 	db.lock.Unlock()
+=======
+	db.logLock.Unlock()
+>>>>>>> upstream/master
 
 	watcher := make(chan notify.EventInfo, 10)
 	if err := notify.Watch(db.logdir, watcher, notify.Create); err != nil {
@@ -240,10 +262,17 @@ loop:
 				log.Warn("Problem with file", "name", opened.Name(), "err", err)
 				break loop
 			}
+<<<<<<< HEAD
 			db.lock.Lock()
 			db.history.Logs.Source.Name = fi.Name()
 			db.history.Logs.Chunk = emptyChunk
 			db.lock.Unlock()
+=======
+			db.logLock.Lock()
+			db.history.Logs.Source.Name = fi.Name()
+			db.history.Logs.Chunk = emptyChunk
+			db.logLock.Unlock()
+>>>>>>> upstream/master
 		case <-ticker.C: // Send log updates to the client.
 			if opened == nil {
 				log.Warn("The last log file is not opened")
@@ -266,7 +295,11 @@ loop:
 
 			var l *LogsMessage
 			// Update the history.
+<<<<<<< HEAD
 			db.lock.Lock()
+=======
+			db.logLock.Lock()
+>>>>>>> upstream/master
 			if bytes.Equal(db.history.Logs.Chunk, emptyChunk) {
 				db.history.Logs.Chunk = chunk
 				l = deepcopy.Copy(db.history.Logs).(*LogsMessage)
@@ -278,7 +311,11 @@ loop:
 				db.history.Logs.Chunk = b
 				l = &LogsMessage{Chunk: chunk}
 			}
+<<<<<<< HEAD
 			db.lock.Unlock()
+=======
+			db.logLock.Unlock()
+>>>>>>> upstream/master
 
 			db.sendToAll(&Message{Logs: l})
 		case errc = <-db.quit:

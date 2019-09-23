@@ -21,9 +21,15 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/eth/downloader"
 	"github.com/Onther-Tech/go-ethereum/p2p"
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
+=======
+	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+>>>>>>> upstream/master
 )
 
 // Tests that fast sync gets disabled as soon as a real block is successfully

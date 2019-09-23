@@ -19,7 +19,11 @@ package vm
 import (
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/crypto"
+=======
+	"github.com/ethereum/go-ethereum/crypto"
+>>>>>>> upstream/master
 )
 
 func TestJumpDestAnalysis(t *testing.T) {

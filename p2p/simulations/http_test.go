@@ -28,6 +28,7 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/event"
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/node"
@@ -36,6 +37,16 @@ import (
 	"github.com/Onther-Tech/go-ethereum/p2p/simulations/adapters"
 	"github.com/Onther-Tech/go-ethereum/rpc"
 	colorable "github.com/mattn/go-colorable"
+=======
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/simulations/adapters"
+	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/mattn/go-colorable"
+>>>>>>> upstream/master
 )
 
 var (
@@ -294,6 +305,7 @@ var testServices = adapters.Services{
 }
 
 func testHTTPServer(t *testing.T) (*Network, *httptest.Server) {
+	t.Helper()
 	adapter := adapters.NewSimAdapter(testServices)
 	network := NewNetwork(adapter, &NetworkConfig{
 		DefaultService: "test",
@@ -420,14 +432,24 @@ type expectEvents struct {
 }
 
 func (t *expectEvents) nodeEvent(id string, up bool) *Event {
+	node := Node{
+		Config: &adapters.NodeConfig{
+			ID: enode.HexID(id),
+		},
+		up: up,
+	}
 	return &Event{
 		Type: EventTypeNode,
+<<<<<<< HEAD
 		Node: &Node{
 			Config: &adapters.NodeConfig{
 				ID: enode.HexID(id),
 			},
 			Up: up,
 		},
+=======
+		Node: &node,
+>>>>>>> upstream/master
 	}
 }
 
@@ -479,6 +501,7 @@ loop:
 }
 
 func (t *expectEvents) expect(events ...*Event) {
+	t.Helper()
 	timeout := time.After(10 * time.Second)
 	i := 0
 	for {
@@ -500,8 +523,8 @@ func (t *expectEvents) expect(events ...*Event) {
 				if event.Node.ID() != expected.Node.ID() {
 					t.Fatalf("expected node event %d to have id %q, got %q", i, expected.Node.ID().TerminalString(), event.Node.ID().TerminalString())
 				}
-				if event.Node.Up != expected.Node.Up {
-					t.Fatalf("expected node event %d to have up=%t, got up=%t", i, expected.Node.Up, event.Node.Up)
+				if event.Node.Up() != expected.Node.Up() {
+					t.Fatalf("expected node event %d to have up=%t, got up=%t", i, expected.Node.Up(), event.Node.Up())
 				}
 
 			case EventTypeConn:

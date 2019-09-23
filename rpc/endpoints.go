@@ -19,7 +19,11 @@ package rpc
 import (
 	"net"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
+=======
+	"github.com/ethereum/go-ethereum/log"
+>>>>>>> upstream/master
 )
 
 // StartHTTPEndpoint starts the HTTP RPC endpoint, configured with cors/vhosts/modules

@@ -26,8 +26,13 @@ import (
 	"reflect"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/common/hexutil"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+>>>>>>> upstream/master
 )
 
 var testAddrHex = "970e8128ab834e8eac17ab8e3812f010678cf791"

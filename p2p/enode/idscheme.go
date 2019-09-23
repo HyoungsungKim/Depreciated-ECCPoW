@@ -21,11 +21,19 @@ import (
 	"fmt"
 	"io"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/math"
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/crypto/sha3"
 	"github.com/Onther-Tech/go-ethereum/p2p/enr"
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/ethereum/go-ethereum/rlp"
+	"golang.org/x/crypto/sha3"
+>>>>>>> upstream/master
 )
 
 // List of known secure identity schemes.
@@ -48,7 +56,11 @@ func SignV4(r *enr.Record, privkey *ecdsa.PrivateKey) error {
 	cpy.Set(enr.ID("v4"))
 	cpy.Set(Secp256k1(privkey.PublicKey))
 
+<<<<<<< HEAD
 	h := sha3.NewKeccak256()
+=======
+	h := sha3.NewLegacyKeccak256()
+>>>>>>> upstream/master
 	rlp.Encode(h, cpy.AppendElements(nil))
 	sig, err := crypto.Sign(h.Sum(nil), privkey)
 	if err != nil {
@@ -69,7 +81,11 @@ func (V4ID) Verify(r *enr.Record, sig []byte) error {
 		return fmt.Errorf("invalid public key")
 	}
 
+<<<<<<< HEAD
 	h := sha3.NewKeccak256()
+=======
+	h := sha3.NewLegacyKeccak256()
+>>>>>>> upstream/master
 	rlp.Encode(h, r.AppendElements(nil))
 	if !crypto.VerifySignature(entry, h.Sum(nil), sig) {
 		return enr.ErrInvalidSig

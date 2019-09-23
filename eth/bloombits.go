@@ -20,6 +20,7 @@ import (
 	"context"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/common/bitutil"
 	"github.com/Onther-Tech/go-ethereum/core"
@@ -27,6 +28,15 @@ import (
 	"github.com/Onther-Tech/go-ethereum/core/rawdb"
 	"github.com/Onther-Tech/go-ethereum/core/types"
 	"github.com/Onther-Tech/go-ethereum/ethdb"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/bitutil"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/bloombits"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethdb"
+>>>>>>> upstream/master
 )
 
 const (
@@ -102,7 +112,11 @@ func NewBloomIndexer(db ethdb.Database, size, confirms uint64) *core.ChainIndexe
 		db:   db,
 		size: size,
 	}
+<<<<<<< HEAD
 	table := ethdb.NewTable(db, string(rawdb.BloomBitsIndexPrefix))
+=======
+	table := rawdb.NewTable(db, string(rawdb.BloomBitsIndexPrefix))
+>>>>>>> upstream/master
 
 	return core.NewChainIndexer(db, table, backend, size, confirms, bloomThrottling, "bloombits")
 }

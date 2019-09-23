@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	ethereum "github.com/Onther-Tech/go-ethereum"
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/consensus/ethash"
@@ -36,6 +37,19 @@ import (
 	"github.com/Onther-Tech/go-ethereum/event"
 	"github.com/Onther-Tech/go-ethereum/params"
 	"github.com/Onther-Tech/go-ethereum/rpc"
+=======
+	ethereum "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/bloombits"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 )
 
 type testBackend struct {
@@ -85,7 +99,11 @@ func (b *testBackend) HeaderByHash(ctx context.Context, hash common.Hash) (*type
 
 func (b *testBackend) GetReceipts(ctx context.Context, hash common.Hash) (types.Receipts, error) {
 	if number := rawdb.ReadHeaderNumber(b.db, hash); number != nil {
+<<<<<<< HEAD
 		return rawdb.ReadReceipts(b.db, hash, *number), nil
+=======
+		return rawdb.ReadReceipts(b.db, hash, *number, params.TestChainConfig), nil
+>>>>>>> upstream/master
 	}
 	return nil, nil
 }
@@ -95,7 +113,11 @@ func (b *testBackend) GetLogs(ctx context.Context, hash common.Hash) ([][]*types
 	if number == nil {
 		return nil, nil
 	}
+<<<<<<< HEAD
 	receipts := rawdb.ReadReceipts(b.db, hash, *number)
+=======
+	receipts := rawdb.ReadReceipts(b.db, hash, *number, params.TestChainConfig)
+>>>>>>> upstream/master
 
 	logs := make([][]*types.Log, len(receipts))
 	for i, receipt := range receipts {
@@ -161,7 +183,11 @@ func TestBlockSubscription(t *testing.T) {
 
 	var (
 		mux         = new(event.TypeMux)
+<<<<<<< HEAD
 		db          = ethdb.NewMemDatabase()
+=======
+		db          = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed      = new(event.Feed)
 		rmLogsFeed  = new(event.Feed)
 		logsFeed    = new(event.Feed)
@@ -218,7 +244,11 @@ func TestPendingTxFilter(t *testing.T) {
 
 	var (
 		mux        = new(event.TypeMux)
+<<<<<<< HEAD
 		db         = ethdb.NewMemDatabase()
+=======
+		db         = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -278,7 +308,11 @@ func TestPendingTxFilter(t *testing.T) {
 func TestLogFilterCreation(t *testing.T) {
 	var (
 		mux        = new(event.TypeMux)
+<<<<<<< HEAD
 		db         = ethdb.NewMemDatabase()
+=======
+		db         = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -327,7 +361,11 @@ func TestInvalidLogFilterCreation(t *testing.T) {
 
 	var (
 		mux        = new(event.TypeMux)
+<<<<<<< HEAD
 		db         = ethdb.NewMemDatabase()
+=======
+		db         = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -354,7 +392,11 @@ func TestInvalidLogFilterCreation(t *testing.T) {
 func TestInvalidGetLogsRequest(t *testing.T) {
 	var (
 		mux        = new(event.TypeMux)
+<<<<<<< HEAD
 		db         = ethdb.NewMemDatabase()
+=======
+		db         = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -384,7 +426,11 @@ func TestLogFilter(t *testing.T) {
 
 	var (
 		mux        = new(event.TypeMux)
+<<<<<<< HEAD
 		db         = ethdb.NewMemDatabase()
+=======
+		db         = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)
@@ -503,7 +549,11 @@ func TestPendingLogsSubscription(t *testing.T) {
 
 	var (
 		mux        = new(event.TypeMux)
+<<<<<<< HEAD
 		db         = ethdb.NewMemDatabase()
+=======
+		db         = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		txFeed     = new(event.Feed)
 		rmLogsFeed = new(event.Feed)
 		logsFeed   = new(event.Feed)

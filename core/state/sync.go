@@ -19,6 +19,7 @@ package state
 import (
 	"bytes"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/rlp"
 	"github.com/Onther-Tech/go-ethereum/trie"
@@ -26,6 +27,16 @@ import (
 
 // NewStateSync create a new state trie download scheduler.
 func NewStateSync(root common.Hash, database trie.DatabaseReader) *trie.Sync {
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
+)
+
+// NewStateSync create a new state trie download scheduler.
+func NewStateSync(root common.Hash, database ethdb.KeyValueReader, bloom *trie.SyncBloom) *trie.Sync {
+>>>>>>> upstream/master
 	var syncer *trie.Sync
 	callback := func(leaf []byte, parent common.Hash) error {
 		var obj Account
@@ -36,6 +47,10 @@ func NewStateSync(root common.Hash, database trie.DatabaseReader) *trie.Sync {
 		syncer.AddRawEntry(common.BytesToHash(obj.CodeHash), 64, parent)
 		return nil
 	}
+<<<<<<< HEAD
 	syncer = trie.NewSync(root, database, callback)
+=======
+	syncer = trie.NewSync(root, database, callback, bloom)
+>>>>>>> upstream/master
 	return syncer
 }

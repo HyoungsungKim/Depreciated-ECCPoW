@@ -5,8 +5,13 @@ import (
 	uurl "net/url"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/metrics"
+=======
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
+>>>>>>> upstream/master
 	"github.com/influxdata/influxdb/client"
 )
 
@@ -91,6 +96,7 @@ func (r *reporter) makeClient() (err error) {
 		URL:      r.url,
 		Username: r.username,
 		Password: r.password,
+		Timeout:  10 * time.Second,
 	})
 
 	return

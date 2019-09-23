@@ -1,4 +1,5 @@
 // Copyright 2018 The go-ethereum Authors
+<<<<<<< HEAD
 // This file is part of go-ethereum.
 //
 // go-ethereum is free software: you can redistribute it and/or modify
@@ -13,12 +14,29 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+=======
+// This file is part of the go-ethereum library.
+//
+// The go-ethereum library is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The go-ethereum library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+>>>>>>> upstream/master
 
 package core
 
 import (
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
 	"strings"
 
 	"math/big"
@@ -53,6 +71,16 @@ func (a Account) String() string {
 	return err.Error()
 }
 
+=======
+	"math/big"
+	"strings"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
+)
+
+>>>>>>> upstream/master
 type ValidationInfo struct {
 	Typ     string `json:"type"`
 	Message string `json:"message"`
@@ -67,6 +95,7 @@ const (
 	INFO = "Info"
 )
 
+<<<<<<< HEAD
 func (vs *ValidationMessages) crit(msg string) {
 	vs.Messages = append(vs.Messages, ValidationInfo{CRIT, msg})
 }
@@ -74,6 +103,15 @@ func (vs *ValidationMessages) warn(msg string) {
 	vs.Messages = append(vs.Messages, ValidationInfo{WARN, msg})
 }
 func (vs *ValidationMessages) info(msg string) {
+=======
+func (vs *ValidationMessages) Crit(msg string) {
+	vs.Messages = append(vs.Messages, ValidationInfo{CRIT, msg})
+}
+func (vs *ValidationMessages) Warn(msg string) {
+	vs.Messages = append(vs.Messages, ValidationInfo{WARN, msg})
+}
+func (vs *ValidationMessages) Info(msg string) {
+>>>>>>> upstream/master
 	vs.Messages = append(vs.Messages, ValidationInfo{INFO, msg})
 }
 
@@ -101,7 +139,11 @@ type SendTxArgs struct {
 	Nonce    hexutil.Uint64           `json:"nonce"`
 	// We accept "data" and "input" for backwards-compatibility reasons.
 	Data  *hexutil.Bytes `json:"data"`
+<<<<<<< HEAD
 	Input *hexutil.Bytes `json:"input"`
+=======
+	Input *hexutil.Bytes `json:"input,omitempty"`
+>>>>>>> upstream/master
 }
 
 func (args SendTxArgs) String() string {

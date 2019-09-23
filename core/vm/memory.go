@@ -20,7 +20,11 @@ import (
 	"fmt"
 	"math/big"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/math"
+=======
+	"github.com/ethereum/go-ethereum/common/math"
+>>>>>>> upstream/master
 )
 
 // Memory implements a simple memory model for the ethereum virtual machine.

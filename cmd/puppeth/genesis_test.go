@@ -18,14 +18,22 @@ package main
 
 import (
 	"encoding/json"
+<<<<<<< HEAD
 	"fmt"
+=======
+>>>>>>> upstream/master
 	"io/ioutil"
 	"reflect"
 	"strings"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/core"
 	"github.com/davecgh/go-spew/spew"
+=======
+	"github.com/davecgh/go-spew/spew"
+	"github.com/ethereum/go-ethereum/core"
+>>>>>>> upstream/master
 )
 
 // Tests the go-ethereum to Aleth chainspec conversion for the Stureby testnet.
@@ -61,7 +69,11 @@ func TestAlethSturebyConverter(t *testing.T) {
 		got := strings.Split(c.Sdump(spec), "\n")
 		for i := 0; i < len(exp) && i < len(got); i++ {
 			if exp[i] != got[i] {
+<<<<<<< HEAD
 				fmt.Printf("got: %v\nexp: %v\n", exp[i], got[i])
+=======
+				t.Logf("got: %v\nexp: %v\n", exp[i], got[i])
+>>>>>>> upstream/master
 			}
 		}
 	}
@@ -102,7 +114,11 @@ func TestParitySturebyConverter(t *testing.T) {
 		got := strings.Split(c.Sdump(spec), "\n")
 		for i := 0; i < len(exp) && i < len(got); i++ {
 			if exp[i] != got[i] {
+<<<<<<< HEAD
 				fmt.Printf("got: %v\nexp: %v\n", exp[i], got[i])
+=======
+				t.Logf("got: %v\nexp: %v\n", exp[i], got[i])
+>>>>>>> upstream/master
 			}
 		}
 	}

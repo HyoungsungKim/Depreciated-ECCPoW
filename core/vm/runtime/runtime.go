@@ -21,12 +21,21 @@ import (
 	"math/big"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/core/state"
 	"github.com/Onther-Tech/go-ethereum/core/vm"
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/ethdb"
 	"github.com/Onther-Tech/go-ethereum/params"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params"
+>>>>>>> upstream/master
 )
 
 // Config is a basic type specifying certain configuration flags for running
@@ -99,7 +108,11 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 	setDefaults(cfg)
 
 	if cfg.State == nil {
+<<<<<<< HEAD
 		cfg.State, _ = state.New(common.Hash{}, state.NewDatabase(ethdb.NewMemDatabase()))
+=======
+		cfg.State, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
+>>>>>>> upstream/master
 	}
 	var (
 		address = common.BytesToAddress([]byte("contract"))
@@ -129,7 +142,11 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 	setDefaults(cfg)
 
 	if cfg.State == nil {
+<<<<<<< HEAD
 		cfg.State, _ = state.New(common.Hash{}, state.NewDatabase(ethdb.NewMemDatabase()))
+=======
+		cfg.State, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
+>>>>>>> upstream/master
 	}
 	var (
 		vmenv  = NewEnv(cfg)

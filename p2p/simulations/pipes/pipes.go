@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Copyright 2017 The go-ethereum Authors
+=======
+// Copyright 2018 The go-ethereum Authors
+>>>>>>> upstream/master
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify

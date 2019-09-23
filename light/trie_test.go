@@ -30,12 +30,27 @@ import (
 	"github.com/Onther-Tech/go-ethereum/params"
 	"github.com/Onther-Tech/go-ethereum/trie"
 	"github.com/davecgh/go-spew/spew"
+<<<<<<< HEAD
+=======
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/trie"
+>>>>>>> upstream/master
 )
 
 func TestNodeIterator(t *testing.T) {
 	var (
+<<<<<<< HEAD
 		fulldb  = ethdb.NewMemDatabase()
 		lightdb = ethdb.NewMemDatabase()
+=======
+		fulldb  = rawdb.NewMemoryDatabase()
+		lightdb = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis = gspec.MustCommit(fulldb)
 	)

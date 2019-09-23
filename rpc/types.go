@@ -17,14 +17,17 @@
 package rpc
 
 import (
+	"context"
 	"fmt"
 	"math"
-	"reflect"
 	"strings"
-	"sync"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/hexutil"
 	mapset "github.com/deckarep/golang-set"
+=======
+	"github.com/ethereum/go-ethereum/common/hexutil"
+>>>>>>> upstream/master
 )
 
 // API describes the set of methods offered over the RPC interface
@@ -35,6 +38,7 @@ type API struct {
 	Public    bool        // indication if the methods must be considered safe for public use
 }
 
+<<<<<<< HEAD
 // callback is a method callback which was registered in the server
 type callback struct {
 	rcvr        reflect.Value  // receiver of method
@@ -86,6 +90,8 @@ type rpcRequest struct {
 	err      Error // invalid batch element
 }
 
+=======
+>>>>>>> upstream/master
 // Error wraps RPC errors, which contain an error code in addition to the message.
 type Error interface {
 	Error() string  // returns the message
@@ -96,24 +102,19 @@ type Error interface {
 // a RPC session. Implementations must be go-routine safe since the codec can be called in
 // multiple go-routines concurrently.
 type ServerCodec interface {
-	// Read next request
-	ReadRequestHeaders() ([]rpcRequest, bool, Error)
-	// Parse request argument to the given types
-	ParseRequestArguments(argTypes []reflect.Type, params interface{}) ([]reflect.Value, Error)
-	// Assemble success response, expects response id and payload
-	CreateResponse(id interface{}, reply interface{}) interface{}
-	// Assemble error response, expects response id and error
-	CreateErrorResponse(id interface{}, err Error) interface{}
-	// Assemble error response with extra information about the error through info
-	CreateErrorResponseWithInfo(id interface{}, err Error, info interface{}) interface{}
-	// Create notification response
-	CreateNotification(id, namespace string, event interface{}) interface{}
-	// Write msg to client.
-	Write(msg interface{}) error
-	// Close underlying data stream
+	Read() (msgs []*jsonrpcMessage, isBatch bool, err error)
 	Close()
-	// Closed when underlying connection is closed
+	jsonWriter
+}
+
+// jsonWriter can write JSON messages to its underlying connection.
+// Implementations must be safe for concurrent use.
+type jsonWriter interface {
+	Write(context.Context, interface{}) error
+	// Closed returns a channel which is closed when the connection is closed.
 	Closed() <-chan interface{}
+	// RemoteAddr returns the peer address of the connection.
+	RemoteAddr() string
 }
 
 type BlockNumber int64

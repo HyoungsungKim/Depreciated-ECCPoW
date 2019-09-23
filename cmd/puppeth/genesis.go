@@ -23,12 +23,21 @@ import (
 	"math/big"
 	"strings"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/common/hexutil"
 	math2 "github.com/Onther-Tech/go-ethereum/common/math"
 	"github.com/Onther-Tech/go-ethereum/consensus/ethash"
 	"github.com/Onther-Tech/go-ethereum/core"
 	"github.com/Onther-Tech/go-ethereum/params"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	math2 "github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
+>>>>>>> upstream/master
 )
 
 // alethGenesisSpec represents the genesis specification format used by the
@@ -145,6 +154,7 @@ func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSp
 
 	for address, account := range genesis.Alloc {
 		spec.setAccount(address, account)
+<<<<<<< HEAD
 	}
 
 	spec.setPrecompile(1, &alethGenesisSpecBuiltin{Name: "ecrecover",
@@ -175,6 +185,42 @@ func (spec *alethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpec
 		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
 	}
 	spec.Accounts[common.UnprefixedAddress(common.BytesToAddress([]byte{address}))].Precompiled = data
+=======
+	}
+
+	spec.setPrecompile(1, &alethGenesisSpecBuiltin{Name: "ecrecover",
+		Linear: &alethGenesisSpecLinearPricing{Base: 3000}})
+	spec.setPrecompile(2, &alethGenesisSpecBuiltin{Name: "sha256",
+		Linear: &alethGenesisSpecLinearPricing{Base: 60, Word: 12}})
+	spec.setPrecompile(3, &alethGenesisSpecBuiltin{Name: "ripemd160",
+		Linear: &alethGenesisSpecLinearPricing{Base: 600, Word: 120}})
+	spec.setPrecompile(4, &alethGenesisSpecBuiltin{Name: "identity",
+		Linear: &alethGenesisSpecLinearPricing{Base: 15, Word: 3}})
+	if genesis.Config.ByzantiumBlock != nil {
+		spec.setPrecompile(5, &alethGenesisSpecBuiltin{Name: "modexp",
+			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64())})
+		spec.setPrecompile(6, &alethGenesisSpecBuiltin{Name: "alt_bn128_G1_add",
+			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()),
+			Linear:        &alethGenesisSpecLinearPricing{Base: 500}})
+		spec.setPrecompile(7, &alethGenesisSpecBuiltin{Name: "alt_bn128_G1_mul",
+			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()),
+			Linear:        &alethGenesisSpecLinearPricing{Base: 40000}})
+		spec.setPrecompile(8, &alethGenesisSpecBuiltin{Name: "alt_bn128_pairing_product",
+			StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64())})
+	}
+	return spec, nil
+}
+
+func (spec *alethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpecBuiltin) {
+	if spec.Accounts == nil {
+		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
+	}
+	addr := common.UnprefixedAddress(common.BytesToAddress([]byte{address}))
+	if _, exist := spec.Accounts[addr]; !exist {
+		spec.Accounts[addr] = &alethGenesisSpecAccount{}
+	}
+	spec.Accounts[addr].Precompiled = data
+>>>>>>> upstream/master
 }
 
 func (spec *alethGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
@@ -219,6 +265,7 @@ type parityChainSpec struct {
 	} `json:"engine"`
 
 	Params struct {
+<<<<<<< HEAD
 		AccountStartNonce     hexutil.Uint64       `json:"accountStartNonce"`
 		MaximumExtraDataSize  hexutil.Uint64       `json:"maximumExtraDataSize"`
 		MinGasLimit           hexutil.Uint64       `json:"minGasLimit"`
@@ -241,6 +288,31 @@ type parityChainSpec struct {
 		EIP1014Transition     hexutil.Uint64       `json:"eip1014Transition"`
 		EIP1052Transition     hexutil.Uint64       `json:"eip1052Transition"`
 		EIP1283Transition     hexutil.Uint64       `json:"eip1283Transition"`
+=======
+		AccountStartNonce        hexutil.Uint64       `json:"accountStartNonce"`
+		MaximumExtraDataSize     hexutil.Uint64       `json:"maximumExtraDataSize"`
+		MinGasLimit              hexutil.Uint64       `json:"minGasLimit"`
+		GasLimitBoundDivisor     math2.HexOrDecimal64 `json:"gasLimitBoundDivisor"`
+		NetworkID                hexutil.Uint64       `json:"networkID"`
+		ChainID                  hexutil.Uint64       `json:"chainID"`
+		MaxCodeSize              hexutil.Uint64       `json:"maxCodeSize"`
+		MaxCodeSizeTransition    hexutil.Uint64       `json:"maxCodeSizeTransition"`
+		EIP98Transition          hexutil.Uint64       `json:"eip98Transition"`
+		EIP150Transition         hexutil.Uint64       `json:"eip150Transition"`
+		EIP160Transition         hexutil.Uint64       `json:"eip160Transition"`
+		EIP161abcTransition      hexutil.Uint64       `json:"eip161abcTransition"`
+		EIP161dTransition        hexutil.Uint64       `json:"eip161dTransition"`
+		EIP155Transition         hexutil.Uint64       `json:"eip155Transition"`
+		EIP140Transition         hexutil.Uint64       `json:"eip140Transition"`
+		EIP211Transition         hexutil.Uint64       `json:"eip211Transition"`
+		EIP214Transition         hexutil.Uint64       `json:"eip214Transition"`
+		EIP658Transition         hexutil.Uint64       `json:"eip658Transition"`
+		EIP145Transition         hexutil.Uint64       `json:"eip145Transition"`
+		EIP1014Transition        hexutil.Uint64       `json:"eip1014Transition"`
+		EIP1052Transition        hexutil.Uint64       `json:"eip1052Transition"`
+		EIP1283Transition        hexutil.Uint64       `json:"eip1283Transition"`
+		EIP1283DisableTransition hexutil.Uint64       `json:"eip1283DisableTransition"`
+>>>>>>> upstream/master
 	} `json:"params"`
 
 	Genesis struct {
@@ -325,15 +397,39 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	spec.Engine.Ethash.Params.HomesteadTransition = hexutil.Uint64(genesis.Config.HomesteadBlock.Uint64())
 
 	// Tangerine Whistle : 150
+<<<<<<< HEAD
 	// https://github.com/Onther-Tech/EIPs/blob/master/EIPS/eip-608.md
 	spec.Params.EIP150Transition = hexutil.Uint64(genesis.Config.EIP150Block.Uint64())
 
 	// Spurious Dragon: 155, 160, 161, 170
 	// https://github.com/Onther-Tech/EIPs/blob/master/EIPS/eip-607.md
+=======
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-608.md
+	spec.Params.EIP150Transition = hexutil.Uint64(genesis.Config.EIP150Block.Uint64())
+
+	// Spurious Dragon: 155, 160, 161, 170
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-607.md
+>>>>>>> upstream/master
 	spec.Params.EIP155Transition = hexutil.Uint64(genesis.Config.EIP155Block.Uint64())
 	spec.Params.EIP160Transition = hexutil.Uint64(genesis.Config.EIP155Block.Uint64())
 	spec.Params.EIP161abcTransition = hexutil.Uint64(genesis.Config.EIP158Block.Uint64())
 	spec.Params.EIP161dTransition = hexutil.Uint64(genesis.Config.EIP158Block.Uint64())
+<<<<<<< HEAD
+=======
+
+	// Byzantium
+	if num := genesis.Config.ByzantiumBlock; num != nil {
+		spec.setByzantium(num)
+	}
+	// Constantinople
+	if num := genesis.Config.ConstantinopleBlock; num != nil {
+		spec.setConstantinople(num)
+	}
+	// ConstantinopleFix (remove eip-1283)
+	if num := genesis.Config.PetersburgBlock; num != nil {
+		spec.setConstantinopleFix(num)
+	}
+>>>>>>> upstream/master
 
 	// Byzantium
 	if num := genesis.Config.ByzantiumBlock; num != nil {
@@ -437,6 +533,13 @@ func (spec *parityChainSpec) setConstantinople(num *big.Int) {
 	spec.Params.EIP1283Transition = n
 }
 
+<<<<<<< HEAD
+=======
+func (spec *parityChainSpec) setConstantinopleFix(num *big.Int) {
+	spec.Params.EIP1283DisableTransition = hexutil.Uint64(num.Uint64())
+}
+
+>>>>>>> upstream/master
 // pyEthereumGenesisSpec represents the genesis specification format used by the
 // Python Ethereum implementation.
 type pyEthereumGenesisSpec struct {

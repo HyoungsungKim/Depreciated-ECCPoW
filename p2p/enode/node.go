@@ -18,6 +18,10 @@ package enode
 
 import (
 	"crypto/ecdsa"
+<<<<<<< HEAD
+=======
+	"encoding/base64"
+>>>>>>> upstream/master
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -26,9 +30,18 @@ import (
 	"net"
 	"strings"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/p2p/enr"
 )
 
+=======
+	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/ethereum/go-ethereum/rlp"
+)
+
+var errMissingPrefix = errors.New("missing 'enr:' prefix for base64-encoded record")
+
+>>>>>>> upstream/master
 // Node represents a host on the network.
 type Node struct {
 	r  enr.Record
@@ -48,6 +61,37 @@ func New(validSchemes enr.IdentityScheme, r *enr.Record) (*Node, error) {
 	return node, nil
 }
 
+<<<<<<< HEAD
+=======
+// MustParse parses a node record or enode:// URL. It panics if the input is invalid.
+func MustParse(rawurl string) *Node {
+	n, err := Parse(ValidSchemes, rawurl)
+	if err != nil {
+		panic("invalid node: " + err.Error())
+	}
+	return n
+}
+
+// Parse decodes and verifies a base64-encoded node record.
+func Parse(validSchemes enr.IdentityScheme, input string) (*Node, error) {
+	if strings.HasPrefix(input, "enode://") {
+		return ParseV4(input)
+	}
+	if !strings.HasPrefix(input, "enr:") {
+		return nil, errMissingPrefix
+	}
+	bin, err := base64.RawURLEncoding.DecodeString(input[4:])
+	if err != nil {
+		return nil, err
+	}
+	var r enr.Record
+	if err := rlp.DecodeBytes(bin, &r); err != nil {
+		return nil, err
+	}
+	return New(validSchemes, &r)
+}
+
+>>>>>>> upstream/master
 // ID returns the node identifier.
 func (n *Node) ID() ID {
 	return n.id
@@ -68,11 +112,27 @@ func (n *Node) Load(k enr.Entry) error {
 	return n.r.Load(k)
 }
 
+<<<<<<< HEAD
 // IP returns the IP address of the node.
 func (n *Node) IP() net.IP {
 	var ip net.IP
 	n.Load((*enr.IP)(&ip))
 	return ip
+=======
+// IP returns the IP address of the node. This prefers IPv4 addresses.
+func (n *Node) IP() net.IP {
+	var (
+		ip4 enr.IPv4
+		ip6 enr.IPv6
+	)
+	if n.Load(&ip4) == nil {
+		return net.IP(ip4)
+	}
+	if n.Load(&ip6) == nil {
+		return net.IP(ip6)
+	}
+	return nil
+>>>>>>> upstream/master
 }
 
 // UDP returns the UDP port of the node.
@@ -105,10 +165,18 @@ func (n *Node) Record() *enr.Record {
 	return &cpy
 }
 
+<<<<<<< HEAD
 // checks whether n is a valid complete node.
 func (n *Node) ValidateComplete() error {
 	if n.Incomplete() {
 		return errors.New("incomplete node")
+=======
+// ValidateComplete checks whether n has a valid IP and UDP port.
+// Deprecated: don't use this method.
+func (n *Node) ValidateComplete() error {
+	if n.Incomplete() {
+		return errors.New("missing IP address")
+>>>>>>> upstream/master
 	}
 	if n.UDP() == 0 {
 		return errors.New("missing UDP port")
@@ -122,20 +190,39 @@ func (n *Node) ValidateComplete() error {
 	return n.Load(&key)
 }
 
+<<<<<<< HEAD
 // The string representation of a Node is a URL.
 // Please see ParseNode for a description of the format.
 func (n *Node) String() string {
 	return n.v4URL()
+=======
+// String returns the text representation of the record.
+func (n *Node) String() string {
+	if isNewV4(n) {
+		return n.URLv4() // backwards-compatibility glue for NewV4 nodes
+	}
+	enc, _ := rlp.EncodeToBytes(&n.r) // always succeeds because record is valid
+	b64 := base64.RawURLEncoding.EncodeToString(enc)
+	return "enr:" + b64
+>>>>>>> upstream/master
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (n *Node) MarshalText() ([]byte, error) {
+<<<<<<< HEAD
 	return []byte(n.v4URL()), nil
+=======
+	return []byte(n.String()), nil
+>>>>>>> upstream/master
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (n *Node) UnmarshalText(text []byte) error {
+<<<<<<< HEAD
 	dec, err := ParseV4(string(text))
+=======
+	dec, err := Parse(ValidSchemes, string(text))
+>>>>>>> upstream/master
 	if err == nil {
 		*n = *dec
 	}

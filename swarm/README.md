@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Swarm
 
 [https://swarm.ethereum.org](https://swarm.ethereum.org)
@@ -242,3 +243,12 @@ included in our repository in the `COPYING.LESSER` file.
 The go-ethereum binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also included
 in our repository in the `COPYING` file.
+=======
+# Swarm
+
+https://swarm.ethereum.org
+
+Swarm is a distributed storage platform and content distribution service, a native base layer service of the ethereum web3 stack. The primary objective of Swarm is to provide a decentralized and redundant store for dapp code and data as well as block chain and state data. Swarm is also set out to provide various base layer services for web3, including node-to-node messaging, media streaming, decentralised database services and scalable state-channel infrastructure for decentralised service economies.
+
+**Note**: The codebase has been moved to [ethersphere/swarm](https://github.com/ethersphere/swarm)
+>>>>>>> upstream/master

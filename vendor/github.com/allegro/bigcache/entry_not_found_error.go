@@ -1,5 +1,6 @@
 package bigcache
 
+<<<<<<< HEAD
 import "fmt"
 
 // EntryNotFoundError is an error type struct which is returned when entry was not found for provided key
@@ -15,3 +16,9 @@ func notFound(key string) error {
 func (e EntryNotFoundError) Error() string {
 	return fmt.Sprintf("Entry %q not found", e.key)
 }
+=======
+import "errors"
+
+// ErrEntryNotFound is an error type struct which is returned when entry was not found for provided key
+var ErrEntryNotFound = errors.New("Entry not found")
+>>>>>>> upstream/master

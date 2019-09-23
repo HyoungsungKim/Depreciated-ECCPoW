@@ -40,7 +40,11 @@ import (
 	"io"
 	"sort"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"github.com/ethereum/go-ethereum/rlp"
+>>>>>>> upstream/master
 )
 
 const SizeLimit = 300 // maximum encoded size of a node record in bytes
@@ -151,6 +155,18 @@ func (r *Record) Set(e Entry) {
 	default:
 		// element should be placed at the end of r.pairs
 		pairs = append(pairs, pair{e.ENRKey(), blob})
+<<<<<<< HEAD
+	}
+	r.pairs = pairs
+}
+
+func (r *Record) invalidate() {
+	if r.signature != nil {
+		r.seq++
+	}
+	r.signature = nil
+	r.raw = nil
+=======
 	}
 	r.pairs = pairs
 }
@@ -163,6 +179,17 @@ func (r *Record) invalidate() {
 	r.raw = nil
 }
 
+// Signature returns the signature of the record.
+func (r *Record) Signature() []byte {
+	if r.signature == nil {
+		return nil
+	}
+	cpy := make([]byte, len(r.signature))
+	copy(cpy, r.signature)
+	return cpy
+>>>>>>> upstream/master
+}
+
 // EncodeRLP implements rlp.Encoder. Encoding fails if
 // the record is unsigned.
 func (r Record) EncodeRLP(w io.Writer) error {
@@ -173,7 +200,7 @@ func (r Record) EncodeRLP(w io.Writer) error {
 	return err
 }
 
-// DecodeRLP implements rlp.Decoder. Decoding verifies the signature.
+// DecodeRLP implements rlp.Decoder. Decoding doesn't verify the signature.
 func (r *Record) DecodeRLP(s *rlp.Stream) error {
 	dec, raw, err := decodeRecord(s)
 	if err != nil {

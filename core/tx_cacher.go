@@ -19,10 +19,17 @@ package core
 import (
 	"runtime"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/core/types"
 )
 
 // senderCacher is a concurrent transaction sender recoverer anc cacher.
+=======
+	"github.com/ethereum/go-ethereum/core/types"
+)
+
+// senderCacher is a concurrent transaction sender recoverer and cacher.
+>>>>>>> upstream/master
 var senderCacher = newTxSenderCacher(runtime.NumCPU())
 
 // txSenderCacherRequest is a request for recovering transaction senders with a

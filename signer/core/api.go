@@ -1,4 +1,5 @@
 // Copyright 2018 The go-ethereum Authors
+<<<<<<< HEAD
 // This file is part of go-ethereum.
 //
 // go-ethereum is free software: you can redistribute it and/or modify
@@ -13,6 +14,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+=======
+// This file is part of the go-ethereum library.
+//
+// The go-ethereum library is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The go-ethereum library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+>>>>>>> upstream/master
 
 package core
 
@@ -21,6 +38,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+<<<<<<< HEAD
 	"io/ioutil"
 	"math/big"
 	"reflect"
@@ -38,12 +56,39 @@ import (
 
 // numberOfAccountsToDerive For hardware wallets, the number of accounts to derive
 const numberOfAccountsToDerive = 10
+=======
+	"math/big"
+	"os"
+	"reflect"
+
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/accounts/scwallet"
+	"github.com/ethereum/go-ethereum/accounts/usbwallet"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/internal/ethapi"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/signer/storage"
+)
+
+const (
+	// numberOfAccountsToDerive For hardware wallets, the number of accounts to derive
+	numberOfAccountsToDerive = 10
+	// ExternalAPIVersion -- see extapi_changelog.md
+	ExternalAPIVersion = "6.0.0"
+	// InternalAPIVersion -- see intapi_changelog.md
+	InternalAPIVersion = "7.0.0"
+)
+>>>>>>> upstream/master
 
 // ExternalAPI defines the external API through which signing requests are made.
 type ExternalAPI interface {
 	// List available accounts
 	List(ctx context.Context) ([]common.Address, error)
 	// New request to create a new account
+<<<<<<< HEAD
 	New(ctx context.Context) (accounts.Account, error)
 	// SignTransaction request to sign the specified transaction
 	SignTransaction(ctx context.Context, args SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error)
@@ -59,14 +104,35 @@ type ExternalAPI interface {
 
 // SignerUI specifies what method a UI needs to implement to be able to be used as a UI for the signer
 type SignerUI interface {
+=======
+	New(ctx context.Context) (common.Address, error)
+	// SignTransaction request to sign the specified transaction
+	SignTransaction(ctx context.Context, args SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error)
+	// SignData - request to sign the given data (plus prefix)
+	SignData(ctx context.Context, contentType string, addr common.MixedcaseAddress, data interface{}) (hexutil.Bytes, error)
+	// SignTypedData - request to sign the given structured data (plus prefix)
+	SignTypedData(ctx context.Context, addr common.MixedcaseAddress, data TypedData) (hexutil.Bytes, error)
+	// EcRecover - recover public key from given message and signature
+	EcRecover(ctx context.Context, data hexutil.Bytes, sig hexutil.Bytes) (common.Address, error)
+	// Version info about the APIs
+	Version(ctx context.Context) (string, error)
+}
+
+// UIClientAPI specifies what method a UI needs to implement to be able to be used as a
+// UI for the signer
+type UIClientAPI interface {
+>>>>>>> upstream/master
 	// ApproveTx prompt the user for confirmation to request to sign Transaction
 	ApproveTx(request *SignTxRequest) (SignTxResponse, error)
 	// ApproveSignData prompt the user for confirmation to request to sign data
 	ApproveSignData(request *SignDataRequest) (SignDataResponse, error)
+<<<<<<< HEAD
 	// ApproveExport prompt the user for confirmation to export encrypted Account json
 	ApproveExport(request *ExportRequest) (ExportResponse, error)
 	// ApproveImport prompt the user for confirmation to import Account json
 	ApproveImport(request *ImportRequest) (ImportResponse, error)
+=======
+>>>>>>> upstream/master
 	// ApproveListing prompt the user for confirmation to list accounts
 	// the list of accounts to list can be modified by the UI
 	ApproveListing(request *ListRequest) (ListResponse, error)
@@ -85,15 +151,42 @@ type SignerUI interface {
 	// OnInputRequired is invoked when clef requires user input, for example master password or
 	// pin-code for unlocking hardware wallets
 	OnInputRequired(info UserInputRequest) (UserInputResponse, error)
+<<<<<<< HEAD
+=======
+	// RegisterUIServer tells the UI to use the given UIServerAPI for ui->clef communication
+	RegisterUIServer(api *UIServerAPI)
+}
+
+// Validator defines the methods required to validate a transaction against some
+// sanity defaults as well as any underlying 4byte method database.
+//
+// Use fourbyte.Database as an implementation. It is separated out of this package
+// to allow pieces of the signer package to be used without having to load the
+// 7MB embedded 4byte dump.
+type Validator interface {
+	// ValidateTransaction does a number of checks on the supplied transaction, and
+	// returns either a list of warnings, or an error (indicating that the transaction
+	// should be immediately rejected).
+	ValidateTransaction(selector *string, tx *SendTxArgs) (*ValidationMessages, error)
+>>>>>>> upstream/master
 }
 
 // SignerAPI defines the actual implementation of ExternalAPI
 type SignerAPI struct {
+<<<<<<< HEAD
 	chainID    *big.Int
 	am         *accounts.Manager
 	UI         SignerUI
 	validator  *Validator
 	rejectMode bool
+=======
+	chainID     *big.Int
+	am          *accounts.Manager
+	UI          UIClientAPI
+	validator   Validator
+	rejectMode  bool
+	credentials storage.Storage
+>>>>>>> upstream/master
 }
 
 // Metadata about a request
@@ -105,6 +198,68 @@ type Metadata struct {
 	Origin    string `json:"Origin"`
 }
 
+<<<<<<< HEAD
+=======
+func StartClefAccountManager(ksLocation string, nousb, lightKDF bool, scpath string) *accounts.Manager {
+	var (
+		backends []accounts.Backend
+		n, p     = keystore.StandardScryptN, keystore.StandardScryptP
+	)
+	if lightKDF {
+		n, p = keystore.LightScryptN, keystore.LightScryptP
+	}
+	// support password based accounts
+	if len(ksLocation) > 0 {
+		backends = append(backends, keystore.NewKeyStore(ksLocation, n, p))
+	}
+	if !nousb {
+		// Start a USB hub for Ledger hardware wallets
+		if ledgerhub, err := usbwallet.NewLedgerHub(); err != nil {
+			log.Warn(fmt.Sprintf("Failed to start Ledger hub, disabling: %v", err))
+		} else {
+			backends = append(backends, ledgerhub)
+			log.Debug("Ledger support enabled")
+		}
+		// Start a USB hub for Trezor hardware wallets (HID version)
+		if trezorhub, err := usbwallet.NewTrezorHubWithHID(); err != nil {
+			log.Warn(fmt.Sprintf("Failed to start HID Trezor hub, disabling: %v", err))
+		} else {
+			backends = append(backends, trezorhub)
+			log.Debug("Trezor support enabled via HID")
+		}
+		// Start a USB hub for Trezor hardware wallets (WebUSB version)
+		if trezorhub, err := usbwallet.NewTrezorHubWithWebUSB(); err != nil {
+			log.Warn(fmt.Sprintf("Failed to start WebUSB Trezor hub, disabling: %v", err))
+		} else {
+			backends = append(backends, trezorhub)
+			log.Debug("Trezor support enabled via WebUSB")
+		}
+	}
+
+	// Start a smart card hub
+	if len(scpath) > 0 {
+		// Sanity check that the smartcard path is valid
+		fi, err := os.Stat(scpath)
+		if err != nil {
+			log.Info("Smartcard socket file missing, disabling", "err", err)
+		} else {
+			if fi.Mode()&os.ModeType != os.ModeSocket {
+				log.Error("Invalid smartcard socket file type", "path", scpath, "type", fi.Mode().String())
+			} else {
+				if schub, err := scwallet.NewHub(scpath, scwallet.Scheme, ksLocation); err != nil {
+					log.Warn(fmt.Sprintf("Failed to start smart card hub, disabling: %v", err))
+				} else {
+					backends = append(backends, schub)
+				}
+			}
+		}
+	}
+
+	// Clef doesn't allow insecure http account unlock.
+	return accounts.NewManager(&accounts.Config{InsecureUnlockAllowed: false}, backends...)
+}
+
+>>>>>>> upstream/master
 // MetadataFromContext extracts Metadata from a given context.Context
 func MetadataFromContext(ctx context.Context) Metadata {
 	m := Metadata{"NA", "NA", "NA", "", ""} // batman
@@ -149,6 +304,7 @@ type (
 		//The UI may make changes to the TX
 		Transaction SendTxArgs `json:"transaction"`
 		Approved    bool       `json:"approved"`
+<<<<<<< HEAD
 		Password    string     `json:"password"`
 	}
 	// ExportRequest info about query to export accounts
@@ -179,11 +335,25 @@ type (
 	SignDataResponse struct {
 		Approved bool `json:"approved"`
 		Password string
+=======
+	}
+	SignDataRequest struct {
+		ContentType string                  `json:"content_type"`
+		Address     common.MixedcaseAddress `json:"address"`
+		Rawdata     []byte                  `json:"raw_data"`
+		Messages    []*NameValueType        `json:"messages"`
+		Hash        hexutil.Bytes           `json:"hash"`
+		Meta        Metadata                `json:"meta"`
+	}
+	SignDataResponse struct {
+		Approved bool `json:"approved"`
+>>>>>>> upstream/master
 	}
 	NewAccountRequest struct {
 		Meta Metadata `json:"meta"`
 	}
 	NewAccountResponse struct {
+<<<<<<< HEAD
 		Approved bool   `json:"approved"`
 		Password string `json:"password"`
 	}
@@ -193,22 +363,40 @@ type (
 	}
 	ListResponse struct {
 		Accounts []Account `json:"accounts"`
+=======
+		Approved bool `json:"approved"`
+	}
+	ListRequest struct {
+		Accounts []accounts.Account `json:"accounts"`
+		Meta     Metadata           `json:"meta"`
+	}
+	ListResponse struct {
+		Accounts []accounts.Account `json:"accounts"`
+>>>>>>> upstream/master
 	}
 	Message struct {
 		Text string `json:"text"`
 	}
+<<<<<<< HEAD
 	PasswordRequest struct {
 		Prompt string `json:"prompt"`
 	}
 	PasswordResponse struct {
 		Password string `json:"password"`
 	}
+=======
+>>>>>>> upstream/master
 	StartupInfo struct {
 		Info map[string]interface{} `json:"info"`
 	}
 	UserInputRequest struct {
+<<<<<<< HEAD
 		Prompt     string `json:"prompt"`
 		Title      string `json:"title"`
+=======
+		Title      string `json:"title"`
+		Prompt     string `json:"prompt"`
+>>>>>>> upstream/master
 		IsPassword bool   `json:"isPassword"`
 	}
 	UserInputResponse struct {
@@ -223,6 +411,7 @@ var ErrRequestDenied = errors.New("Request denied")
 // key that is generated when a new Account is created.
 // noUSB disables USB support that is required to support hardware devices such as
 // ledger and trezor.
+<<<<<<< HEAD
 func NewSignerAPI(chainID int64, ksLocation string, noUSB bool, ui SignerUI, abidb *AbiDb, lightKDF bool, advancedMode bool) *SignerAPI {
 	var (
 		backends []accounts.Backend
@@ -255,6 +444,13 @@ func NewSignerAPI(chainID int64, ksLocation string, noUSB bool, ui SignerUI, abi
 		}
 	}
 	signer := &SignerAPI{big.NewInt(chainID), accounts.NewManager(backends...), ui, NewValidator(abidb), !advancedMode}
+=======
+func NewSignerAPI(am *accounts.Manager, chainID int64, noUSB bool, ui UIClientAPI, validator Validator, advancedMode bool, credentials storage.Storage) *SignerAPI {
+	if advancedMode {
+		log.Info("Clef is in advanced mode: will warn instead of reject")
+	}
+	signer := &SignerAPI{big.NewInt(chainID), am, ui, validator, !advancedMode, credentials}
+>>>>>>> upstream/master
 	if !noUSB {
 		signer.startUSBListener()
 	}
@@ -321,12 +517,19 @@ func (api *SignerAPI) startUSBListener() {
 				status, _ := event.Wallet.Status()
 				log.Info("New wallet appeared", "url", event.Wallet.URL(), "status", status)
 
+<<<<<<< HEAD
 				derivationPath := accounts.DefaultBaseDerivationPath
 				if event.Wallet.URL().Scheme == "ledger" {
 					derivationPath = accounts.DefaultLedgerBaseDerivationPath
 				}
 				var nextPath = derivationPath
 				// Derive first N accounts, hardcoded for now
+=======
+				// Derive first N accounts, hardcoded for now
+				var nextPath = make(accounts.DerivationPath, len(accounts.DefaultBaseDerivationPath))
+				copy(nextPath[:], accounts.DefaultBaseDerivationPath[:])
+
+>>>>>>> upstream/master
 				for i := 0; i < numberOfAccountsToDerive; i++ {
 					acc, err := event.Wallet.Derive(nextPath, true)
 					if err != nil {
@@ -347,12 +550,18 @@ func (api *SignerAPI) startUSBListener() {
 // List returns the set of wallet this signer manages. Each wallet can contain
 // multiple accounts.
 func (api *SignerAPI) List(ctx context.Context) ([]common.Address, error) {
+<<<<<<< HEAD
 	var accs []Account
 	for _, wallet := range api.am.Wallets() {
 		for _, acc := range wallet.Accounts() {
 			acc := Account{Typ: "Account", URL: wallet.URL(), Address: acc.Address}
 			accs = append(accs, acc)
 		}
+=======
+	var accs []accounts.Account
+	for _, wallet := range api.am.Wallets() {
+		accs = append(accs, wallet.Accounts()...)
+>>>>>>> upstream/master
 	}
 	result, err := api.UI.ApproveListing(&ListRequest{Accounts: accs, Meta: MetadataFromContext(ctx)})
 	if err != nil {
@@ -362,7 +571,10 @@ func (api *SignerAPI) List(ctx context.Context) ([]common.Address, error) {
 		return nil, ErrRequestDenied
 
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
 	addresses := make([]common.Address, 0)
 	for _, acc := range result.Accounts {
 		addresses = append(addresses, acc.Address)
@@ -374,6 +586,7 @@ func (api *SignerAPI) List(ctx context.Context) ([]common.Address, error) {
 // New creates a new password protected Account. The private key is protected with
 // the given password. Users are responsible to backup the private key that is stored
 // in the keystore location thas was specified when this API was created.
+<<<<<<< HEAD
 func (api *SignerAPI) New(ctx context.Context) (accounts.Account, error) {
 	be := api.am.Backends(keystore.KeyStoreType)
 	if len(be) == 0 {
@@ -401,6 +614,42 @@ func (api *SignerAPI) New(ctx context.Context) (accounts.Account, error) {
 	}
 	// Otherwise fail, with generic error message
 	return accounts.Account{}, errors.New("account creation failed")
+=======
+func (api *SignerAPI) New(ctx context.Context) (common.Address, error) {
+	be := api.am.Backends(keystore.KeyStoreType)
+	if len(be) == 0 {
+		return common.Address{}, errors.New("password based accounts not supported")
+	}
+	if resp, err := api.UI.ApproveNewAccount(&NewAccountRequest{MetadataFromContext(ctx)}); err != nil {
+		return common.Address{}, err
+	} else if !resp.Approved {
+		return common.Address{}, ErrRequestDenied
+	}
+
+	// Three retries to get a valid password
+	for i := 0; i < 3; i++ {
+		resp, err := api.UI.OnInputRequired(UserInputRequest{
+			"New account password",
+			fmt.Sprintf("Please enter a password for the new account to be created (attempt %d of 3)", i),
+			true})
+		if err != nil {
+			log.Warn("error obtaining password", "attempt", i, "error", err)
+			continue
+		}
+		if pwErr := ValidatePasswordFormat(resp.Text); pwErr != nil {
+			api.UI.ShowError(fmt.Sprintf("Account creation attempt #%d failed due to password requirements: %v", (i + 1), pwErr))
+		} else {
+			// No error
+			acc, err := be[0].(*keystore.KeyStore).NewAccount(resp.Text)
+			log.Info("Your new key was generated", "address", acc.Address)
+			log.Warn("Please backup your key file!", "path", acc.URL.Path)
+			log.Warn("Please remember your password!")
+			return acc.Address, err
+		}
+	}
+	// Otherwise fail, with generic error message
+	return common.Address{}, errors.New("account creation failed")
+>>>>>>> upstream/master
 }
 
 // logDiff logs the difference between the incoming (original) transaction and the one returned from the signer.
@@ -449,13 +698,40 @@ func logDiff(original *SignTxRequest, new *SignTxResponse) bool {
 	return modified
 }
 
+<<<<<<< HEAD
+=======
+func (api *SignerAPI) lookupPassword(address common.Address) (string, error) {
+	return api.credentials.Get(address.Hex())
+}
+
+func (api *SignerAPI) lookupOrQueryPassword(address common.Address, title, prompt string) (string, error) {
+	// Look up the password and return if available
+	if pw, err := api.lookupPassword(address); err == nil {
+		return pw, nil
+	}
+	// Password unavailable, request it from the user
+	pwResp, err := api.UI.OnInputRequired(UserInputRequest{title, prompt, true})
+	if err != nil {
+		log.Warn("error obtaining password", "error", err)
+		// We'll not forward the error here, in case the error contains info about the response from the UI,
+		// which could leak the password if it was malformed json or something
+		return "", errors.New("internal error")
+	}
+	return pwResp.Text, nil
+}
+
+>>>>>>> upstream/master
 // SignTransaction signs the given Transaction and returns it both as json and rlp-encoded form
 func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, methodSelector *string) (*ethapi.SignTransactionResult, error) {
 	var (
 		err    error
 		result SignTxResponse
 	)
+<<<<<<< HEAD
 	msgs, err := api.validator.ValidateTransaction(&args, methodSelector)
+=======
+	msgs, err := api.validator.ValidateTransaction(methodSelector, &args)
+>>>>>>> upstream/master
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +741,10 @@ func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, meth
 			return nil, err
 		}
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
 	req := SignTxRequest{
 		Transaction: args,
 		Meta:        MetadataFromContext(ctx),
@@ -492,9 +771,20 @@ func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, meth
 	}
 	// Convert fields into a real transaction
 	var unsignedTx = result.Transaction.toTransaction()
+<<<<<<< HEAD
 
 	// The one to sign is the one that was returned from the UI
 	signedTx, err := wallet.SignTxWithPassphrase(acc, result.Password, unsignedTx, api.chainID)
+=======
+	// Get the password for the transaction
+	pw, err := api.lookupOrQueryPassword(acc.Address, "Account password",
+		fmt.Sprintf("Please enter the password for account %s", acc.Address.String()))
+	if err != nil {
+		return nil, err
+	}
+	// The one to sign is the one that was returned from the UI
+	signedTx, err := wallet.SignTxWithPassphrase(acc, pw, unsignedTx, api.chainID)
+>>>>>>> upstream/master
 	if err != nil {
 		api.UI.ShowError(err.Error())
 		return nil, err
@@ -510,6 +800,7 @@ func (api *SignerAPI) SignTransaction(ctx context.Context, args SendTxArgs, meth
 
 }
 
+<<<<<<< HEAD
 // Sign calculates an Ethereum ECDSA signature for:
 // keccack256("\x19Ethereum Signed Message:\n" + len(message) + message))
 //
@@ -609,4 +900,10 @@ func (api *SignerAPI) Import(ctx context.Context, keyJSON json.RawMessage) (Acco
 		return Account{}, err
 	}
 	return Account{Typ: "Account", URL: acc.URL, Address: acc.Address}, nil
+=======
+// Returns the external api version. This method does not require user acceptance. Available methods are
+// available via enumeration anyway, and this info does not contain user-specific data
+func (api *SignerAPI) Version(ctx context.Context) (string, error) {
+	return ExternalAPIVersion, nil
+>>>>>>> upstream/master
 }

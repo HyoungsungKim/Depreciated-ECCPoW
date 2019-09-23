@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Copyright 2017 The go-ethereum Authors
+=======
+// Copyright 2018 The go-ethereum Authors
+>>>>>>> upstream/master
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -21,7 +25,11 @@ import (
 )
 
 func TestURLParsing(t *testing.T) {
+<<<<<<< HEAD
 	url, err := parseURL("https://Onther-Tech.org")
+=======
+	url, err := parseURL("https://ethereum.org")
+>>>>>>> upstream/master
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -40,8 +48,13 @@ func TestURLParsing(t *testing.T) {
 
 func TestURLString(t *testing.T) {
 	url := URL{Scheme: "https", Path: "ethereum.org"}
+<<<<<<< HEAD
 	if url.String() != "https://Onther-Tech.org" {
 		t.Errorf("expected: %v, got: %v", "https://Onther-Tech.org", url.String())
+=======
+	if url.String() != "https://ethereum.org" {
+		t.Errorf("expected: %v, got: %v", "https://ethereum.org", url.String())
+>>>>>>> upstream/master
 	}
 
 	url = URL{Scheme: "", Path: "ethereum.org"}
@@ -56,14 +69,23 @@ func TestURLMarshalJSON(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpcted error: %v", err)
 	}
+<<<<<<< HEAD
 	if string(json) != "\"https://Onther-Tech.org\"" {
 		t.Errorf("expected: %v, got: %v", "\"https://Onther-Tech.org\"", string(json))
+=======
+	if string(json) != "\"https://ethereum.org\"" {
+		t.Errorf("expected: %v, got: %v", "\"https://ethereum.org\"", string(json))
+>>>>>>> upstream/master
 	}
 }
 
 func TestURLUnmarshalJSON(t *testing.T) {
 	url := &URL{}
+<<<<<<< HEAD
 	err := url.UnmarshalJSON([]byte("\"https://Onther-Tech.org\""))
+=======
+	err := url.UnmarshalJSON([]byte("\"https://ethereum.org\""))
+>>>>>>> upstream/master
 	if err != nil {
 		t.Errorf("unexpcted error: %v", err)
 	}

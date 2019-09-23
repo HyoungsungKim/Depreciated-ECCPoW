@@ -56,7 +56,12 @@ func TestWaitDeployed(t *testing.T) {
 		backend := backends.NewSimulatedBackend(
 			core.GenesisAlloc{
 				crypto.PubkeyToAddress(testKey.PublicKey): {Balance: big.NewInt(10000000000)},
+<<<<<<< HEAD
 			}, 10000000,
+=======
+			},
+			10000000,
+>>>>>>> upstream/master
 		)
 
 		// Create the transaction.

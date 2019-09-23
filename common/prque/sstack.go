@@ -1,5 +1,7 @@
 // This is a duplicated and slightly modified version of "gopkg.in/karalabe/cookiejar.v2/collections/prque".
 
+// This is a duplicated and slightly modified version of "gopkg.in/karalabe/cookiejar.v2/collections/prque".
+
 package prque
 
 // The size of a block of data
@@ -14,16 +16,27 @@ type item struct {
 	priority int64
 }
 
+<<<<<<< HEAD:common/prque/sstack.go
 // setIndexCallback is called when the element is moved to a new index.
 // Providing setIndexCallback is optional, it is needed only if the application needs
 // to delete elements other than the top one.
 type setIndexCallback func(a interface{}, i int)
+=======
+// SetIndexCallback is called when the element is moved to a new index.
+// Providing SetIndexCallback is optional, it is needed only if the application needs
+// to delete elements other than the top one.
+type SetIndexCallback func(data interface{}, index int)
+>>>>>>> upstream/master:common/prque/sstack.go
 
 // Internal sortable stack data structure. Implements the Push and Pop ops for
 // the stack (heap) functionality and the Len, Less and Swap methods for the
 // sortability requirements of the heaps.
 type sstack struct {
+<<<<<<< HEAD:common/prque/sstack.go
 	setIndex setIndexCallback
+=======
+	setIndex SetIndexCallback
+>>>>>>> upstream/master:common/prque/sstack.go
 	size     int
 	capacity int
 	offset   int
@@ -33,7 +46,11 @@ type sstack struct {
 }
 
 // Creates a new, empty stack.
+<<<<<<< HEAD:common/prque/sstack.go
 func newSstack(setIndex setIndexCallback) *sstack {
+=======
+func newSstack(setIndex SetIndexCallback) *sstack {
+>>>>>>> upstream/master:common/prque/sstack.go
 	result := new(sstack)
 	result.setIndex = setIndex
 	result.active = make([]*item, blockSize)

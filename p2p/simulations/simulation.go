@@ -20,7 +20,11 @@ import (
 	"context"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
+=======
+	"github.com/ethereum/go-ethereum/p2p/enode"
+>>>>>>> upstream/master
 )
 
 // Simulation provides a framework for running actions in a simulated network

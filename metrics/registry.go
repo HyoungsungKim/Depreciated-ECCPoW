@@ -312,8 +312,14 @@ func (r *PrefixedRegistry) UnregisterAll() {
 }
 
 var (
+<<<<<<< HEAD
 	DefaultRegistry   = NewRegistry()
 	EphemeralRegistry = NewRegistry()
+=======
+	DefaultRegistry    = NewRegistry()
+	EphemeralRegistry  = NewRegistry()
+	AccountingRegistry = NewRegistry() // registry used in swarm
+>>>>>>> upstream/master
 )
 
 // Call the given function for each registered metric.

@@ -114,8 +114,8 @@ func TestAddressUnmarshalJSON(t *testing.T) {
 			if test.ShouldErr {
 				t.Errorf("test #%d: expected error, got none", i)
 			}
-			if v.Big().Cmp(test.Output) != 0 {
-				t.Errorf("test #%d: address mismatch: have %v, want %v", i, v.Big(), test.Output)
+			if got := new(big.Int).SetBytes(v.Bytes()); got.Cmp(test.Output) != 0 {
+				t.Errorf("test #%d: address mismatch: have %v, want %v", i, got, test.Output)
 			}
 		}
 	}
@@ -154,7 +154,11 @@ func BenchmarkAddressHex(b *testing.B) {
 
 func TestMixedcaseAccount_Address(t *testing.T) {
 
+<<<<<<< HEAD
 	// https://github.com/Onther-Tech/EIPs/blob/master/EIPS/eip-55.md
+=======
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md
+>>>>>>> upstream/master
 	// Note: 0X{checksum_addr} is not valid according to spec above
 
 	var res []struct {

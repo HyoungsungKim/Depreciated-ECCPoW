@@ -16,6 +16,15 @@ const (
 	minimumEmptyBlobSize = 32 + headerEntrySize
 )
 
+<<<<<<< HEAD
+=======
+var (
+	errEmptyQueue       = &queueError{"Empty queue"}
+	errInvalidIndex     = &queueError{"Index must be greater than zero. Invalid index."}
+	errIndexOutOfBounds = &queueError{"Index out of range"}
+)
+
+>>>>>>> upstream/master
 // BytesQueue is a non-thread safe queue type of fifo based on bytes array.
 // For every push operation index of entry is returned. It can be used to read the entry later
 type BytesQueue struct {
@@ -162,6 +171,14 @@ func (q *BytesQueue) Get(index int) ([]byte, error) {
 	return data, err
 }
 
+<<<<<<< HEAD
+=======
+// CheckGet checks if an entry can be read from index
+func (q *BytesQueue) CheckGet(index int) error {
+	return q.peekCheckErr(index)
+}
+
+>>>>>>> upstream/master
 // Capacity returns number of allocated bytes for queue
 func (q *BytesQueue) Capacity() int {
 	return q.capacity
@@ -177,6 +194,7 @@ func (e *queueError) Error() string {
 	return e.message
 }
 
+<<<<<<< HEAD
 func (q *BytesQueue) peek(index int) ([]byte, int, error) {
 
 	if q.count == 0 {
@@ -189,6 +207,37 @@ func (q *BytesQueue) peek(index int) ([]byte, int, error) {
 
 	if index+headerEntrySize >= len(q.array) {
 		return nil, 0, &queueError{"Index out of range"}
+=======
+// peekCheckErr is identical to peek, but does not actually return any data
+func (q *BytesQueue) peekCheckErr(index int) error {
+
+	if q.count == 0 {
+		return errEmptyQueue
+	}
+
+	if index <= 0 {
+		return errInvalidIndex
+	}
+
+	if index+headerEntrySize >= len(q.array) {
+		return errIndexOutOfBounds
+	}
+	return nil
+}
+
+func (q *BytesQueue) peek(index int) ([]byte, int, error) {
+
+	if q.count == 0 {
+		return nil, 0, errEmptyQueue
+	}
+
+	if index <= 0 {
+		return nil, 0, errInvalidIndex
+	}
+
+	if index+headerEntrySize >= len(q.array) {
+		return nil, 0, errIndexOutOfBounds
+>>>>>>> upstream/master
 	}
 
 	blockSize := int(binary.LittleEndian.Uint32(q.array[index : index+headerEntrySize]))

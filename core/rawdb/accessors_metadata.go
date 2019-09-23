@@ -19,6 +19,7 @@ package rawdb
 import (
 	"encoding/json"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/params"
@@ -39,12 +40,47 @@ func ReadDatabaseVersion(db DatabaseReader) int {
 func WriteDatabaseVersion(db DatabaseWriter, version int) {
 	enc, _ := rlp.EncodeToBytes(version)
 	if err := db.Put(databaseVerisionKey, enc); err != nil {
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rlp"
+)
+
+// ReadDatabaseVersion retrieves the version number of the database.
+func ReadDatabaseVersion(db ethdb.KeyValueReader) *uint64 {
+	var version uint64
+
+	enc, _ := db.Get(databaseVerisionKey)
+	if len(enc) == 0 {
+		return nil
+	}
+	if err := rlp.DecodeBytes(enc, &version); err != nil {
+		return nil
+	}
+
+	return &version
+}
+
+// WriteDatabaseVersion stores the version number of the database
+func WriteDatabaseVersion(db ethdb.KeyValueWriter, version uint64) {
+	enc, err := rlp.EncodeToBytes(version)
+	if err != nil {
+		log.Crit("Failed to encode database version", "err", err)
+	}
+	if err = db.Put(databaseVerisionKey, enc); err != nil {
+>>>>>>> upstream/master
 		log.Crit("Failed to store the database version", "err", err)
 	}
 }
 
 // ReadChainConfig retrieves the consensus settings based on the given genesis hash.
+<<<<<<< HEAD
 func ReadChainConfig(db DatabaseReader, hash common.Hash) *params.ChainConfig {
+=======
+func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *params.ChainConfig {
+>>>>>>> upstream/master
 	data, _ := db.Get(configKey(hash))
 	if len(data) == 0 {
 		return nil
@@ -58,7 +94,11 @@ func ReadChainConfig(db DatabaseReader, hash common.Hash) *params.ChainConfig {
 }
 
 // WriteChainConfig writes the chain config settings to the database.
+<<<<<<< HEAD
 func WriteChainConfig(db DatabaseWriter, hash common.Hash, cfg *params.ChainConfig) {
+=======
+func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg *params.ChainConfig) {
+>>>>>>> upstream/master
 	if cfg == nil {
 		return
 	}
@@ -72,13 +112,21 @@ func WriteChainConfig(db DatabaseWriter, hash common.Hash, cfg *params.ChainConf
 }
 
 // ReadPreimage retrieves a single preimage of the provided hash.
+<<<<<<< HEAD
 func ReadPreimage(db DatabaseReader, hash common.Hash) []byte {
+=======
+func ReadPreimage(db ethdb.KeyValueReader, hash common.Hash) []byte {
+>>>>>>> upstream/master
 	data, _ := db.Get(preimageKey(hash))
 	return data
 }
 
 // WritePreimages writes the provided set of preimages to the database.
+<<<<<<< HEAD
 func WritePreimages(db DatabaseWriter, preimages map[common.Hash][]byte) {
+=======
+func WritePreimages(db ethdb.KeyValueWriter, preimages map[common.Hash][]byte) {
+>>>>>>> upstream/master
 	for hash, preimage := range preimages {
 		if err := db.Put(preimageKey(hash), preimage); err != nil {
 			log.Crit("Failed to store trie preimage", "err", err)

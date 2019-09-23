@@ -42,7 +42,10 @@ class PipeTransport(ServerTransport):
         self.output.write("\n")
 
 class StdIOHandler():
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
     def __init__(self):
         pass
 
@@ -76,7 +79,11 @@ class StdIOHandler():
         :param transaction: transaction info
         :param call_info: info abou the call, e.g. if ABI info could not be
         :param meta: metadata about the request, e.g. where the call comes from
+<<<<<<< HEAD
         :return: 
+=======
+        :return:
+>>>>>>> upstream/master
         """
         transaction = req.get('transaction')
         _from       = req.get('from')
@@ -158,8 +165,12 @@ class StdIOHandler():
         return
 
 def main(args):
+<<<<<<< HEAD
 
     cmd = ["./clef", "--stdio-ui"]
+=======
+    cmd = ["clef", "--stdio-ui"]
+>>>>>>> upstream/master
     if len(args) > 0 and args[0] == "test":
         cmd.extend(["--stdio-ui-test"])
     print("cmd: {}".format(" ".join(cmd)))

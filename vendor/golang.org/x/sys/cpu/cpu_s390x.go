@@ -5,3 +5,8 @@
 package cpu
 
 const cacheLineSize = 256
+<<<<<<< HEAD
+=======
+
+func doinit() {}
+>>>>>>> upstream/master

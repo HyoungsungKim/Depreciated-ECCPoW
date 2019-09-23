@@ -25,6 +25,7 @@ import (
 	"sync"
 	"time"
 
+<<<<<<< HEAD
 	ethereum "github.com/Onther-Tech/go-ethereum"
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/core"
@@ -33,6 +34,16 @@ import (
 	"github.com/Onther-Tech/go-ethereum/event"
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/rpc"
+=======
+	ethereum "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 )
 
 // Type determines the kind of filter and is used to put the filter in to

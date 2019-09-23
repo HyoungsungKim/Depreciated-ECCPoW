@@ -38,9 +38,16 @@ import (
 	"os"
 	"path/filepath"
 
+<<<<<<< HEAD:accounts/keystore/passphrase.go
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/common/math"
 	"github.com/Onther-Tech/go-ethereum/crypto"
+=======
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/crypto"
+>>>>>>> upstream/master:accounts/keystore/passphrase.go
 	"github.com/pborman/uuid"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/scrypt"
@@ -97,9 +104,15 @@ func (ks keyStorePassphrase) GetKey(addr common.Address, filename, auth string) 
 }
 
 // StoreKey generates a key, encrypts with 'auth' and stores in the given directory
+<<<<<<< HEAD:accounts/keystore/passphrase.go
 func StoreKey(dir, auth string, scryptN, scryptP int) (common.Address, error) {
 	_, a, err := storeNewKey(&keyStorePassphrase{dir, scryptN, scryptP, false}, rand.Reader, auth)
 	return a.Address, err
+=======
+func StoreKey(dir, auth string, scryptN, scryptP int) (accounts.Account, error) {
+	_, a, err := storeNewKey(&keyStorePassphrase{dir, scryptN, scryptP, false}, rand.Reader, auth)
+	return a, err
+>>>>>>> upstream/master:accounts/keystore/passphrase.go
 }
 
 func (ks keyStorePassphrase) StoreKey(filename string, key *Key, auth string) error {
@@ -120,7 +133,11 @@ func (ks keyStorePassphrase) StoreKey(filename string, key *Key, auth string) er
 				"This indicates that the keystore is corrupted. \n" +
 				"The corrupted file is stored at \n%v\n" +
 				"Please file a ticket at:\n\n" +
+<<<<<<< HEAD:accounts/keystore/passphrase.go
 				"https://github.com/Onther-Tech/go-ethereum/issues." +
+=======
+				"https://github.com/ethereum/go-ethereum/issues." +
+>>>>>>> upstream/master:accounts/keystore/passphrase.go
 				"The error was : %s"
 			return fmt.Errorf(msg, tmpName, err)
 		}

@@ -1,4 +1,4 @@
-// Copyright 2017 The go-ethereum Authors
+// Copyright 2018 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -20,13 +20,22 @@ import (
 	"fmt"
 	"sync"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
+=======
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+>>>>>>> upstream/master
 )
 
 type TestPeer interface {
 	ID() enode.ID
+<<<<<<< HEAD
 	Drop(error)
+=======
+	Drop()
+>>>>>>> upstream/master
 }
 
 // TestPeerPool is an example peerPool to demonstrate registration of peer connections

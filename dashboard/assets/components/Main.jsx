@@ -18,11 +18,17 @@
 
 import React, {Component} from 'react';
 
-import withStyles from 'material-ui/styles/withStyles';
+import withStyles from '@material-ui/core/styles/withStyles';
 
+import Network from 'Network';
+import Logs from 'Logs';
+import Footer from 'Footer';
 import {MENU} from '../common';
+<<<<<<< HEAD
 import Logs from './Logs';
 import Footer from './Footer';
+=======
+>>>>>>> upstream/master
 import type {Content} from '../types/content';
 
 // styles contains the constant styles of the component.
@@ -54,14 +60,21 @@ export type Props = {
 	send:         string => void,
 };
 
+type State = {};
+
 // Main renders the chosen content.
+<<<<<<< HEAD
 class Main extends Component<Props> {
+=======
+class Main extends Component<Props, State> {
+>>>>>>> upstream/master
 	constructor(props) {
 		super(props);
 		this.container = React.createRef();
 		this.content = React.createRef();
 	}
 
+<<<<<<< HEAD
 	getSnapshotBeforeUpdate() {
 		if (this.content && typeof this.content.beforeUpdate === 'function') {
 			return this.content.beforeUpdate();
@@ -69,6 +82,8 @@ class Main extends Component<Props> {
 		return null;
 	}
 
+=======
+>>>>>>> upstream/master
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		if (this.content && typeof this.content.didUpdate === 'function') {
 			this.content.didUpdate(prevProps, prevState, snapshot);
@@ -81,6 +96,16 @@ class Main extends Component<Props> {
 		}
 	};
 
+<<<<<<< HEAD
+=======
+	getSnapshotBeforeUpdate(prevProps: Readonly<P>, prevState: Readonly<S>) {
+		if (this.content && typeof this.content.beforeUpdate === 'function') {
+			return this.content.beforeUpdate();
+		}
+		return null;
+	}
+
+>>>>>>> upstream/master
 	render() {
 		const {
 			classes, active, content, shouldUpdate,
@@ -89,9 +114,20 @@ class Main extends Component<Props> {
 		let children = null;
 		switch (active) {
 		case MENU.get('home').id:
+			children = <div>Work in progress.</div>;
+			break;
 		case MENU.get('chain').id:
+			children = <div>Work in progress.</div>;
+			break;
 		case MENU.get('txpool').id:
+			children = <div>Work in progress.</div>;
+			break;
 		case MENU.get('network').id:
+			children = <Network
+				content={this.props.content.network}
+				container={this.container}
+			/>;
+			break;
 		case MENU.get('system').id:
 			children = <div>Work in progress.</div>;
 			break;

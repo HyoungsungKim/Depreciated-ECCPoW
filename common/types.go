@@ -26,8 +26,13 @@ import (
 	"reflect"
 	"strings"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/hexutil"
 	"github.com/Onther-Tech/go-ethereum/crypto/sha3"
+=======
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"golang.org/x/crypto/sha3"
+>>>>>>> upstream/master
 )
 
 // Lengths of hashes and addresses in bytes.
@@ -139,6 +144,24 @@ func (h *Hash) Scan(src interface{}) error {
 // Value implements valuer for database/sql.
 func (h Hash) Value() (driver.Value, error) {
 	return h[:], nil
+<<<<<<< HEAD
+=======
+}
+
+// ImplementsGraphQLType returns true if Hash implements the specified GraphQL type.
+func (_ Hash) ImplementsGraphQLType(name string) bool { return name == "Bytes32" }
+
+// UnmarshalGraphQL unmarshals the provided GraphQL query data.
+func (h *Hash) UnmarshalGraphQL(input interface{}) error {
+	var err error
+	switch input := input.(type) {
+	case string:
+		*h = HexToHash(input)
+	default:
+		err = fmt.Errorf("Unexpected type for Bytes32: %v", input)
+	}
+	return err
+>>>>>>> upstream/master
 }
 
 // UnprefixedHash allows marshaling a Hash without 0x prefix.
@@ -187,16 +210,19 @@ func IsHexAddress(s string) bool {
 // Bytes gets the string representation of the underlying address.
 func (a Address) Bytes() []byte { return a[:] }
 
+<<<<<<< HEAD
 // Big converts an address to a big integer.
 func (a Address) Big() *big.Int { return new(big.Int).SetBytes(a[:]) }
 
+=======
+>>>>>>> upstream/master
 // Hash converts an address to a hash by left-padding it with zeros.
 func (a Address) Hash() Hash { return BytesToHash(a[:]) }
 
 // Hex returns an EIP55-compliant hex string representation of the address.
 func (a Address) Hex() string {
 	unchecksummed := hex.EncodeToString(a[:])
-	sha := sha3.NewKeccak256()
+	sha := sha3.NewLegacyKeccak256()
 	sha.Write([]byte(unchecksummed))
 	hash := sha.Sum(nil)
 
@@ -268,6 +294,24 @@ func (a Address) Value() (driver.Value, error) {
 	return a[:], nil
 }
 
+<<<<<<< HEAD
+=======
+// ImplementsGraphQLType returns true if Hash implements the specified GraphQL type.
+func (a Address) ImplementsGraphQLType(name string) bool { return name == "Address" }
+
+// UnmarshalGraphQL unmarshals the provided GraphQL query data.
+func (a *Address) UnmarshalGraphQL(input interface{}) error {
+	var err error
+	switch input := input.(type) {
+	case string:
+		*a = HexToAddress(input)
+	default:
+		err = fmt.Errorf("Unexpected type for Address: %v", input)
+	}
+	return err
+}
+
+>>>>>>> upstream/master
 // UnprefixedAddress allows marshaling an Address without 0x prefix.
 type UnprefixedAddress Address
 

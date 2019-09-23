@@ -17,21 +17,31 @@
 package p2p
 
 import (
+<<<<<<< HEAD
 	"container/heap"
+=======
+>>>>>>> upstream/master
 	"errors"
 	"fmt"
 	"net"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
 	"github.com/Onther-Tech/go-ethereum/p2p/netutil"
+=======
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/netutil"
+>>>>>>> upstream/master
 )
 
 const (
-	// This is the amount of time spent waiting in between
-	// redialing a certain node.
-	dialHistoryExpiration = 30 * time.Second
+	// This is the amount of time spent waiting in between redialing a certain node. The
+	// limit is a bit higher than inboundThrottleTime to prevent failing dials in small
+	// private networks.
+	dialHistoryExpiration = inboundThrottleTime + 5*time.Second
 
 	// Discovery lookups are throttled and can only run
 	// once every few seconds.
@@ -65,23 +75,33 @@ func (t TCPDialer) Dial(dest *enode.Node) (net.Conn, error) {
 }
 
 // dialstate schedules dials and discovery lookups.
-// it get's a chance to compute new tasks on every iteration
+// It gets a chance to compute new tasks on every iteration
 // of the main loop in Server.run.
 type dialstate struct {
 	maxDynDials int
 	ntab        discoverTable
 	netrestrict *netutil.Netlist
 	self        enode.ID
+<<<<<<< HEAD
+=======
+	bootnodes   []*enode.Node // default dials when there are no peers
+	log         log.Logger
+>>>>>>> upstream/master
 
+	start         time.Time // time when the dialer was first used
 	lookupRunning bool
 	dialing       map[enode.ID]connFlag
 	lookupBuf     []*enode.Node // current discovery lookup results
 	randomNodes   []*enode.Node // filled from Table
 	static        map[enode.ID]*dialTask
+<<<<<<< HEAD
 	hist          *dialHistory
 
 	start     time.Time     // time when the dialer was first used
 	bootnodes []*enode.Node // default dials when there are no peers
+=======
+	hist          expHeap
+>>>>>>> upstream/master
 }
 
 type discoverTable interface {
@@ -89,6 +109,7 @@ type discoverTable interface {
 	Resolve(*enode.Node) *enode.Node
 	LookupRandom() []*enode.Node
 	ReadRandomNodes([]*enode.Node) int
+<<<<<<< HEAD
 }
 
 // the dial history remembers recent dials.
@@ -98,6 +119,8 @@ type dialHistory []pastDial
 type pastDial struct {
 	id  enode.ID
 	exp time.Time
+=======
+>>>>>>> upstream/master
 }
 
 type task interface {
@@ -126,20 +149,36 @@ type waitExpireTask struct {
 	time.Duration
 }
 
+<<<<<<< HEAD
 func newDialState(self enode.ID, static []*enode.Node, bootnodes []*enode.Node, ntab discoverTable, maxdyn int, netrestrict *netutil.Netlist) *dialstate {
+=======
+func newDialState(self enode.ID, ntab discoverTable, maxdyn int, cfg *Config) *dialstate {
+>>>>>>> upstream/master
 	s := &dialstate{
 		maxDynDials: maxdyn,
 		ntab:        ntab,
 		self:        self,
+<<<<<<< HEAD
 		netrestrict: netrestrict,
 		static:      make(map[enode.ID]*dialTask),
 		dialing:     make(map[enode.ID]connFlag),
 		bootnodes:   make([]*enode.Node, len(bootnodes)),
 		randomNodes: make([]*enode.Node, maxdyn/2),
 		hist:        new(dialHistory),
+=======
+		netrestrict: cfg.NetRestrict,
+		log:         cfg.Logger,
+		static:      make(map[enode.ID]*dialTask),
+		dialing:     make(map[enode.ID]connFlag),
+		bootnodes:   make([]*enode.Node, len(cfg.BootstrapNodes)),
+		randomNodes: make([]*enode.Node, maxdyn/2),
+>>>>>>> upstream/master
 	}
-	copy(s.bootnodes, bootnodes)
-	for _, n := range static {
+	copy(s.bootnodes, cfg.BootstrapNodes)
+	if s.log == nil {
+		s.log = log.Root()
+	}
+	for _, n := range cfg.StaticNodes {
 		s.addStatic(n)
 	}
 	return s
@@ -154,9 +193,12 @@ func (s *dialstate) addStatic(n *enode.Node) {
 func (s *dialstate) removeStatic(n *enode.Node) {
 	// This removes a task so future attempts to connect will not be made.
 	delete(s.static, n.ID())
+<<<<<<< HEAD
 	// This removes a previous dial timestamp so that application
 	// can force a server to reconnect with chosen peer immediately.
 	s.hist.remove(n.ID())
+=======
+>>>>>>> upstream/master
 }
 
 func (s *dialstate) newTasks(nRunning int, peers map[enode.ID]*Peer, now time.Time) []task {
@@ -167,7 +209,11 @@ func (s *dialstate) newTasks(nRunning int, peers map[enode.ID]*Peer, now time.Ti
 	var newtasks []task
 	addDial := func(flag connFlag, n *enode.Node) bool {
 		if err := s.checkDial(n, peers); err != nil {
+<<<<<<< HEAD
 			log.Trace("Skipping dial candidate", "id", n.ID(), "addr", &net.TCPAddr{IP: n.IP(), Port: n.TCP()}, "err", err)
+=======
+			s.log.Trace("Skipping dial candidate", "id", n.ID(), "addr", &net.TCPAddr{IP: n.IP(), Port: n.TCP()}, "err", err)
+>>>>>>> upstream/master
 			return false
 		}
 		s.dialing[n.ID()] = flag
@@ -196,7 +242,11 @@ func (s *dialstate) newTasks(nRunning int, peers map[enode.ID]*Peer, now time.Ti
 		err := s.checkDial(t.dest, peers)
 		switch err {
 		case errNotWhitelisted, errSelf:
+<<<<<<< HEAD
 			log.Warn("Removing static dial candidate", "id", t.dest.ID, "addr", &net.TCPAddr{IP: t.dest.IP(), Port: t.dest.TCP()}, "err", err)
+=======
+			s.log.Warn("Removing static dial candidate", "id", t.dest.ID, "addr", &net.TCPAddr{IP: t.dest.IP(), Port: t.dest.TCP()}, "err", err)
+>>>>>>> upstream/master
 			delete(s.static, t.dest.ID())
 		case nil:
 			s.dialing[id] = t.flags
@@ -246,7 +296,7 @@ func (s *dialstate) newTasks(nRunning int, peers map[enode.ID]*Peer, now time.Ti
 	// This should prevent cases where the dialer logic is not ticked
 	// because there are no pending events.
 	if nRunning == 0 && len(newtasks) == 0 && s.hist.Len() > 0 {
-		t := &waitExpireTask{s.hist.min().exp.Sub(now)}
+		t := &waitExpireTask{s.hist.nextExpiry().Sub(now)}
 		newtasks = append(newtasks, t)
 	}
 	return newtasks
@@ -271,7 +321,11 @@ func (s *dialstate) checkDial(n *enode.Node, peers map[enode.ID]*Peer) error {
 		return errSelf
 	case s.netrestrict != nil && !s.netrestrict.Contains(n.IP()):
 		return errNotWhitelisted
+<<<<<<< HEAD
 	case s.hist.contains(n.ID()):
+=======
+	case s.hist.contains(string(n.ID().Bytes())):
+>>>>>>> upstream/master
 		return errRecentlyDialed
 	}
 	return nil
@@ -280,7 +334,11 @@ func (s *dialstate) checkDial(n *enode.Node, peers map[enode.ID]*Peer) error {
 func (s *dialstate) taskDone(t task, now time.Time) {
 	switch t := t.(type) {
 	case *dialTask:
+<<<<<<< HEAD
 		s.hist.add(t.dest.ID(), now.Add(dialHistoryExpiration))
+=======
+		s.hist.add(string(t.dest.ID().Bytes()), now.Add(dialHistoryExpiration))
+>>>>>>> upstream/master
 		delete(s.dialing, t.dest.ID())
 	case *discoverTask:
 		s.lookupRunning = false
@@ -296,7 +354,7 @@ func (t *dialTask) Do(srv *Server) {
 	}
 	err := t.dial(srv, t.dest)
 	if err != nil {
-		log.Trace("Dial error", "task", t, "err", err)
+		srv.log.Trace("Dial error", "task", t, "err", err)
 		// Try resolving the ID of static nodes if dialing failed.
 		if _, ok := err.(*dialError); ok && t.flags&staticDialedConn != 0 {
 			if t.resolve(srv) {
@@ -314,7 +372,7 @@ func (t *dialTask) Do(srv *Server) {
 // The backoff delay resets when the node is found.
 func (t *dialTask) resolve(srv *Server) bool {
 	if srv.ntab == nil {
-		log.Debug("Can't resolve node", "id", t.dest.ID, "err", "discovery is disabled")
+		srv.log.Debug("Can't resolve node", "id", t.dest.ID, "err", "discovery is disabled")
 		return false
 	}
 	if t.resolveDelay == 0 {
@@ -330,13 +388,17 @@ func (t *dialTask) resolve(srv *Server) bool {
 		if t.resolveDelay > maxResolveDelay {
 			t.resolveDelay = maxResolveDelay
 		}
-		log.Debug("Resolving node failed", "id", t.dest.ID, "newdelay", t.resolveDelay)
+		srv.log.Debug("Resolving node failed", "id", t.dest.ID, "newdelay", t.resolveDelay)
 		return false
 	}
 	// The node was found.
 	t.resolveDelay = initialResolveDelay
 	t.dest = resolved
+<<<<<<< HEAD
 	log.Debug("Resolved node", "id", t.dest.ID, "addr", &net.TCPAddr{IP: t.dest.IP(), Port: t.dest.TCP()})
+=======
+	srv.log.Debug("Resolved node", "id", t.dest.ID, "addr", &net.TCPAddr{IP: t.dest.IP(), Port: t.dest.TCP()})
+>>>>>>> upstream/master
 	return true
 }
 
@@ -385,6 +447,7 @@ func (t waitExpireTask) Do(*Server) {
 func (t waitExpireTask) String() string {
 	return fmt.Sprintf("wait for dial hist expire (%v)", t.Duration)
 }
+<<<<<<< HEAD
 
 // Use only these methods to access or modify dialHistory.
 func (h dialHistory) min() pastDial {
@@ -431,3 +494,5 @@ func (h *dialHistory) Pop() interface{} {
 	*h = old[0 : n-1]
 	return x
 }
+=======
+>>>>>>> upstream/master

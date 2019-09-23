@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Copyright 2017 The go-ethereum Authors
+=======
+// Copyright 2018 The go-ethereum Authors
+>>>>>>> upstream/master
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -23,7 +27,11 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/p2p/simulations/pipes"
+=======
+	"github.com/ethereum/go-ethereum/p2p/simulations/pipes"
+>>>>>>> upstream/master
 )
 
 func TestTCPPipe(t *testing.T) {

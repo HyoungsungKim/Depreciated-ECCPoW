@@ -10,5 +10,9 @@ Changes by Version
 1.0.0 (2016-09-26)
 -------------------
 
+<<<<<<< HEAD
 - This release implements OpenTracing Specification 1.0 (http://opentracing.io/spec)
+=======
+- This release implements OpenTracing Specification 1.0 (https://opentracing.io/spec)
+>>>>>>> upstream/master
 

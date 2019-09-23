@@ -1,4 +1,5 @@
 // Copyright 2018 The go-ethereum Authors
+<<<<<<< HEAD
 // This file is part of go-ethereum.
 //
 // go-ethereum is free software: you can redistribute it and/or modify
@@ -14,6 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 //
+=======
+// This file is part of the go-ethereum library.
+//
+// The go-ethereum library is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The go-ethereum library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+
+>>>>>>> upstream/master
 package storage
 
 import (
@@ -23,8 +41,13 @@ import (
 	"io/ioutil"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/log"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/log"
+>>>>>>> upstream/master
 	"github.com/mattn/go-colorable"
 )
 
@@ -38,13 +61,21 @@ func TestEncryption(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+<<<<<<< HEAD
 	fmt.Printf("Ciphertext %x, nonce %x\n", c, iv)
+=======
+	t.Logf("Ciphertext %x, nonce %x\n", c, iv)
+>>>>>>> upstream/master
 
 	p, err := decrypt(key, iv, c, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+<<<<<<< HEAD
 	fmt.Printf("Plaintext %v\n", string(p))
+=======
+	t.Logf("Plaintext %v\n", string(p))
+>>>>>>> upstream/master
 	if !bytes.Equal(plaintext, p) {
 		t.Errorf("Failed: expected plaintext recovery, got %v expected %v", string(plaintext), string(p))
 	}
@@ -110,8 +141,13 @@ func TestEnd2End(t *testing.T) {
 	}
 
 	s1.Put("bazonk", "foobar")
+<<<<<<< HEAD
 	if v := s2.Get("bazonk"); v != "foobar" {
 		t.Errorf("Expected bazonk->foobar, got '%v'", v)
+=======
+	if v, err := s2.Get("bazonk"); v != "foobar" || err != nil {
+		t.Errorf("Expected bazonk->foobar (nil error), got '%v' (%v error)", v, err)
+>>>>>>> upstream/master
 	}
 }
 
@@ -154,11 +190,19 @@ func TestSwappedKeys(t *testing.T) {
 		}
 	}
 	swap()
+<<<<<<< HEAD
 	if v := s1.Get("k1"); v != "" {
 		t.Errorf("swapped value should return empty")
 	}
 	swap()
 	if v := s1.Get("k1"); v != "v1" {
+=======
+	if v, _ := s1.Get("k1"); v != "" {
+		t.Errorf("swapped value should return empty")
+	}
+	swap()
+	if v, _ := s1.Get("k1"); v != "v1" {
+>>>>>>> upstream/master
 		t.Errorf("double-swapped value should work fine")
 	}
 }

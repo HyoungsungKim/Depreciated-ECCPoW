@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Clef
 ----
 Clef can be used to sign transactions and data and is meant as a replacement for geth's account management.
@@ -20,16 +21,43 @@ Check out
 
 ## Command line flags
 Clef accepts the following command line options:
+=======
+# Clef
+
+Clef can be used to sign transactions and data and is meant as a(n eventual) replacement for Geth's account management. This allows DApps to not depend on Geth's account management. When a DApp wants to sign data (or a transaction), it can send the content to Clef, which will then provide the user with context and asks for permission to sign the content. If the users grants the signing request, Clef will send the signature back to the DApp.
+
+This setup allows a DApp to connect to a remote Ethereum node and send transactions that are locally signed. This can help in situations when a DApp is connected to an untrusted remote Ethereum node, because a local one is not available, not synchronised with the chain, or is a node that has no built-in (or limited) account management.
+
+Clef can run as a daemon on the same machine, off a usb-stick like [USB armory](https://inversepath.com/usbarmory), or even a separate VM in a [QubesOS](https://www.qubes-os.org/) type setup.
+
+Check out the
+
+* [CLI tutorial](tutorial.md) for some concrete examples on how Clef works.
+* [Setup docs](docs/setup.md) for infos on how to configure Clef on QubesOS or USB Armory.
+* [Data types](datatypes.md) for details on the communication messages between Clef and an external UI.
+
+## Command line flags
+
+Clef accepts the following command line options:
+
+>>>>>>> upstream/master
 ```
 COMMANDS:
    init    Initialize the signer, generate secret storage
    attest  Attest that a js-file is to be used
+<<<<<<< HEAD
    addpw   Store a credential for a keystore file
+=======
+   setpw   Store a credential for a keystore file
+   delpw   Remove a credential for a keystore file
+   gendoc  Generate documentation about json-rpc format
+>>>>>>> upstream/master
    help    Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --loglevel value        log level to emit to the screen (default: 4)
    --keystore value        Directory for the keystore (default: "$HOME/.ethereum/keystore")
+<<<<<<< HEAD
    --configdir value       Directory for clef configuration (default: "$HOME/.clef")
    --networkid value       Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby) (default: 1)
    --lightkdf              Reduce key-derivation RAM & CPU usage at some expense of KDF strength
@@ -69,11 +97,56 @@ The general flow for signing a transaction using e.g. geth is as follows:
 ![image](sign_flow.png)
 
 In this case, `geth` would be started with `--externalsigner=http://localhost:8550` and would relay requests to `eth.sendTransaction`.
+=======
+   --configdir value       Directory for Clef configuration (default: "$HOME/.clef")
+   --chainid value         Chain id to use for signing (1=mainnet, 3=Ropsten, 4=Rinkeby, 5=Goerli) (default: 1)
+   --lightkdf              Reduce key-derivation RAM & CPU usage at some expense of KDF strength
+   --nousb                 Disables monitoring for and managing USB hardware wallets
+   --pcscdpath value       Path to the smartcard daemon (pcscd) socket file (default: "/run/pcscd/pcscd.comm")
+   --rpcaddr value         HTTP-RPC server listening interface (default: "localhost")
+   --rpcvhosts value       Comma separated list of virtual hostnames from which to accept requests (server enforced). Accepts '*' wildcard. (default: "localhost")
+   --ipcdisable            Disable the IPC-RPC server
+   --ipcpath               Filename for IPC socket/pipe within the datadir (explicit paths escape it)
+   --rpc                   Enable the HTTP-RPC server
+   --rpcport value         HTTP-RPC server listening port (default: 8550)
+   --signersecret value    A file containing the (encrypted) master seed to encrypt Clef data, e.g. keystore credentials and ruleset hash
+   --4bytedb-custom value  File used for writing new 4byte-identifiers submitted via API (default: "./4byte-custom.json")
+   --auditlog value        File used to emit audit logs. Set to "" to disable (default: "audit.log")
+   --rules value           Path to the rule file to auto-authorize requests with
+   --stdio-ui              Use STDIN/STDOUT as a channel for an external UI. This means that an STDIN/STDOUT is used for RPC-communication with a e.g. a graphical user interface, and can be used when Clef is started by an external process.
+   --stdio-ui-test         Mechanism to test interface between Clef and UI. Requires 'stdio-ui'.
+   --advanced              If enabled, issues warnings instead of rejections for suspicious requests. Default off
+   --help, -h              show help
+   --version, -v           print the version
+```
+
+Example:
+
+```
+$ clef -keystore /my/keystore -chainid 4
+```
+
+## Security model
+
+The security model of Clef is as follows:
+
+* One critical component (the Clef binary / daemon) is responsible for handling cryptographic operations: signing, private keys, encryption/decryption of keystore files.
+* Clef has a well-defined 'external' API.
+* The 'external' API is considered UNTRUSTED.
+* Clef also communicates with whatever process that invoked the binary, via stdin/stdout.
+  * This channel is considered 'trusted'. Over this channel, approvals and passwords are communicated.
+
+The general flow for signing a transaction using e.g. Geth is as follows:
+![image](sign_flow.png)
+
+In this case, `geth` would be started with `--signer http://localhost:8550` and would relay requests to `eth.sendTransaction`.
+>>>>>>> upstream/master
 
 ## TODOs
 
 Some snags and todos
 
+<<<<<<< HEAD
 * [ ] The signer should take a startup param "--no-change", for UIs that do not contain the capability
    to perform changes to things, only approve/deny. Such a UI should be able to start the signer in
    a more secure mode by telling it that it only wants approve/deny capabilities.
@@ -90,6 +163,15 @@ accounts if it immediately returned "unknown account".
 invoking methods with the following info:
   * [x] Version info about the signer
   * [x] Address of API (http/ipc)
+=======
+* [ ] Clef should take a startup param "--no-change", for UIs that do not contain the capability to perform changes to things, only approve/deny. Such a UI should be able to start the signer in a more secure mode by telling it that it only wants approve/deny capabilities.
+* [x] It would be nice if Clef could collect new 4byte-id:s/method selectors, and have a secondary database for those (`4byte_custom.json`). Users could then (optionally) submit their collections for inclusion upstream.
+* [ ] It should be possible to configure Clef to check if an account is indeed known to it, before passing on to the UI. The reason it currently does not, is that it would make it possible to enumerate accounts if it immediately returned "unknown account" (side channel attack).
+* [x] It should be possible to configure Clef to auto-allow listing (certain) accounts, instead of asking every time.
+* [x] Done Upon startup, Clef should spit out some info to the caller (particularly important when executed in `stdio-ui`-mode), invoking methods with the following info:
+  * [x] Version info about the signer
+  * [x] Address of API (HTTP/IPC)
+>>>>>>> upstream/master
   * [ ] List of known accounts
 * [ ] Have a default timeout on signing operations, so that if the user has not answered within e.g. 60 seconds, the request is rejected.
 * [ ] `account_signRawTransaction`
@@ -102,6 +184,7 @@ invoking methods with the following info:
       * the number of unique recipients
 
 * Geth todos
+<<<<<<< HEAD
     - The signer should pass the `Origin` header as call-info to the UI. As of right now, the way that info about the request is
 put together is a bit of a hack into the http server. This could probably be greatly improved
     - Relay: Geth should be started in `geth --external_signer localhost:8550`.
@@ -117,6 +200,18 @@ put together is a bit of a hack into the http server. This could probably be gre
 * Another potential thing to introduce is pairing.
   * To prevent spurious requests which users just accept, implement a way to "pair" the caller with the signer (external API).
   * Thus geth/mist/cpp would cryptographically handshake and afterwards the caller would be allowed to make signing requests.
+=======
+    - The signer should pass the `Origin` header as call-info to the UI. As of right now, the way that info about the request is put together is a bit of a hack into the HTTP server. This could probably be greatly improved.
+    - Relay: Geth should be started in `geth --signer localhost:8550`.
+    - Currently, the Geth APIs use `common.Address` in the arguments to transaction submission (e.g `to` field). This type is 20 `bytes`, and is incapable of carrying checksum information. The signer uses `common.MixedcaseAddress`, which retains the original input.
+    - The Geth API should switch to use the same type, and relay `to`-account verbatim to the external API.
+* [x] Storage
+    * [x] An encrypted key-value storage should be implemented.
+    * See [rules.md](rules.md) for more info about this.
+* Another potential thing to introduce is pairing.
+  * To prevent spurious requests which users just accept, implement a way to "pair" the caller with the signer (external API).
+  * Thus Geth/cpp would cryptographically handshake and afterwards the caller would be allowed to make signing requests.
+>>>>>>> upstream/master
   * This feature would make the addition of rules less dangerous.
 
 * Wallets / accounts. Add API methods for wallets.
@@ -125,6 +220,7 @@ put together is a bit of a hack into the http server. This could probably be gre
 
 ### External API
 
+<<<<<<< HEAD
 The signer listens to HTTP requests on `rpcaddr`:`rpcport`, with the same JSONRPC standard as Geth. The messages are
 expected to be JSON [jsonrpc 2.0 standard](http://www.jsonrpc.org/specification).
 
@@ -140,12 +236,24 @@ The signer has one native console-based UI, for operation without any standalone
 However, there is also an API to communicate with an external UI. To enable that UI,
 the signer needs to be executed with the `--stdio-ui` option, which allocates the
 `stdin`/`stdout` for the UI-api.
+=======
+Clef listens to HTTP requests on `rpcaddr`:`rpcport` (or to IPC on `ipcpath`), with the same JSON-RPC standard as Geth. The messages are expected to be [JSON-RPC 2.0 standard](https://www.jsonrpc.org/specification).
+
+Some of these call can require user interaction. Clients must be aware that responses may be delayed significantly or may never be received if a users decides to ignore the confirmation request.
+
+The External API is **untrusted**: it does not accept credentials over this API, nor does it expect that requests have any authority.
+
+### Internal UI API
+
+Clef has one native console-based UI, for operation without any standalone tools. However, there is also an API to communicate with an external UI. To enable that UI, the signer needs to be executed with the `--stdio-ui` option, which allocates `stdin` / `stdout` for the UI API.
+>>>>>>> upstream/master
 
 An example (insecure) proof-of-concept of has been implemented in `pythonsigner.py`.
 
 The model is as follows:
 
 * The user starts the UI app (`pythonsigner.py`).
+<<<<<<< HEAD
 * The UI app starts the `signer` with `--stdio-ui`, and listens to the
 process output for confirmation-requests.
 * The `signer` opens the external http api.
@@ -156,6 +264,18 @@ process output for confirmation-requests.
 ## External API
 
 See the [external api changelog](extapi_changelog.md) for information about changes to this API.
+=======
+* The UI app starts `clef` with `--stdio-ui`, and listens to the
+process output for confirmation-requests.
+* `clef` opens the external HTTP API.
+* When the `signer` receives requests, it sends a JSON-RPC request via `stdout`.
+* The UI app prompts the user accordingly, and responds to `clef`.
+* `clef` signs (or not), and responds to the original request.
+
+## External API
+
+See the [external API changelog](extapi_changelog.md) for information about changes to this API.
+>>>>>>> upstream/master
 
 ### Encoding
 - number: positive integers that are hex encoded
@@ -180,7 +300,11 @@ None
 #### Result
   - address [string]: account address that is derived from the generated key
   - url [string]: location of the keyfile
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
@@ -189,7 +313,13 @@ None
   "method": "account_new",
   "params": []
 }
+<<<<<<< HEAD
 
+=======
+```
+Response
+```
+>>>>>>> upstream/master
 {
   "id": 0,
   "jsonrpc": "2.0",
@@ -212,9 +342,15 @@ None
 #### Result
   - array with account records:
      - account.address [string]: account address that is derived from the generated key
+<<<<<<< HEAD
      - account.type [string]: type of the 
      - account.url [string]: location of the account
   
+=======
+     - account.type [string]: type of the
+     - account.url [string]: location of the account
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
@@ -222,7 +358,13 @@ None
   "jsonrpc": "2.0",
   "method": "account_list"
 }
+<<<<<<< HEAD
 
+=======
+```
+Response
+```
+>>>>>>> upstream/master
 {
   "id": 1,
   "jsonrpc": "2.0",
@@ -261,7 +403,11 @@ None
 
 #### Result
   - signed transaction in RLP encoded form [data]
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
@@ -285,8 +431,13 @@ Response
 
 ```json
 {
+<<<<<<< HEAD
   "jsonrpc": "2.0",
   "id": 67,
+=======
+  "id": 2,
+  "jsonrpc": "2.0",
+>>>>>>> upstream/master
   "error": {
     "code": -32000,
     "message": "Request denied"
@@ -298,6 +449,10 @@ Response
 
 ```json
 {
+<<<<<<< HEAD
+=======
+  "id": 67,
+>>>>>>> upstream/master
   "jsonrpc": "2.0",
   "method": "account_signTransaction",
   "params": [
@@ -311,8 +466,12 @@ Response
       "data": "0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"
     },
     "safeSend(address)"
+<<<<<<< HEAD
   ],
   "id": 67
+=======
+  ]
+>>>>>>> upstream/master
 }
 ```
 Response
@@ -346,26 +505,49 @@ Bash example:
 {"jsonrpc":"2.0","id":67,"result":{"raw":"0xf88380018203339407a565b7ed7d7a678680a4c162885bedbb695fe080a44401a6e4000000000000000000000000000000000000000000000000000000000000001226a0223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20ea02aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663","tx":{"nonce":"0x0","gasPrice":"0x1","gas":"0x333","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0","value":"0x0","input":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012","v":"0x26","r":"0x223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20e","s":"0x2aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663","hash":"0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e"}}}
 ```
 
+<<<<<<< HEAD
 
 ### account_sign
+=======
+### account_signData
+>>>>>>> upstream/master
 
 #### Sign data
    Signs a chunk of data and returns the calculated signature.
 
 #### Arguments
+<<<<<<< HEAD
   - account [address]: account to sign with
   - data [data]: data to sign
 
 #### Result
   - calculated signature [data]
   
+=======
+  - content type [string]: type of signed data
+     - `text/validator`: hex data with custom validator defined in a contract
+     - `application/clique`: [clique](https://github.com/ethereum/EIPs/issues/225) headers
+     - `text/plain`: simple hex data validated by `account_ecRecover`
+  - account [address]: account to sign with
+  - data [object]: data to sign
+
+#### Result
+  - calculated signature [data]
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
   "id": 3,
   "jsonrpc": "2.0",
+<<<<<<< HEAD
   "method": "account_sign",
   "params": [
+=======
+  "method": "account_signData",
+  "params": [
+    "data/plain",
+>>>>>>> upstream/master
     "0x1923f626bb8dc025849e00f99c25fe2b2f7fb0db",
     "0xaabbccdd"
   ]
@@ -381,18 +563,128 @@ Response
 }
 ```
 
+<<<<<<< HEAD
 ### account_ecRecover
 
 #### Recover address
    Derive the address from the account that was used to sign data from the data and signature.
    
+=======
+### account_signTypedData
+
+#### Sign data
+   Signs a chunk of structured data conformant to [EIP712]([EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md)) and returns the calculated signature.
+
+#### Arguments
+  - account [address]: account to sign with
+  - data [object]: data to sign
+
+#### Result
+  - calculated signature [data]
+
+#### Sample call
+```json
+{
+  "id": 68,
+  "jsonrpc": "2.0",
+  "method": "account_signTypedData",
+  "params": [
+    "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+    {
+      "types": {
+        "EIP712Domain": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "name": "verifyingContract",
+            "type": "address"
+          }
+        ],
+        "Person": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          }
+        ],
+        "Mail": [
+          {
+            "name": "from",
+            "type": "Person"
+          },
+          {
+            "name": "to",
+            "type": "Person"
+          },
+          {
+            "name": "contents",
+            "type": "string"
+          }
+        ]
+      },
+      "primaryType": "Mail",
+      "domain": {
+        "name": "Ether Mail",
+        "version": "1",
+        "chainId": 1,
+        "verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+      },
+      "message": {
+        "from": {
+          "name": "Cow",
+          "wallet": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+        },
+        "to": {
+          "name": "Bob",
+          "wallet": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+        },
+        "contents": "Hello, Bob!"
+      }
+    }
+  ]
+}
+```
+Response
+
+```json
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": "0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c"
+}
+```
+
+### account_ecRecover
+
+#### Sign data
+
+Derive the address from the account that was used to sign data with content type `text/plain` and the signature.
+
+>>>>>>> upstream/master
 #### Arguments
   - data [data]: data that was signed
   - signature [data]: the signature to verify
 
 #### Result
   - derived account [address]
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
@@ -400,6 +692,10 @@ Response
   "jsonrpc": "2.0",
   "method": "account_ecRecover",
   "params": [
+<<<<<<< HEAD
+=======
+    "data/plain",
+>>>>>>> upstream/master
     "0xaabbccdd",
     "0x5b6693f153b48ec1c706ba4169960386dbaa6903e249cc79a8e6ddc434451d417e1e57327872c7f538beeb323c300afa9999a3d4a5de6caf3be0d5ef832b67ef1c"
   ]
@@ -413,7 +709,10 @@ Response
   "jsonrpc": "2.0",
   "result": "0x1923f626bb8dc025849e00f99c25fe2b2f7fb0db"
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
 ```
 
 ### account_import
@@ -421,16 +720,26 @@ Response
 #### Import account
    Import a private key into the keystore. The imported key is expected to be encrypted according to the web3 keystore
    format.
+<<<<<<< HEAD
    
 #### Arguments
   - account [object]: key in [web3 keystore format](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) (retrieved with account_export) 
+=======
+
+#### Arguments
+  - account [object]: key in [web3 keystore format](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) (retrieved with account_export)
+>>>>>>> upstream/master
 
 #### Result
   - imported key [object]:
      - key.address [address]: address of the imported key
      - key.type [string]: type of the account
      - key.url [string]: key URL
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
@@ -458,7 +767,11 @@ Response
       },
       "id": "09bccb61-b8d3-4e93-bf4f-205a8194f0b9",
       "version": 3
+<<<<<<< HEAD
     },
+=======
+    }
+>>>>>>> upstream/master
   ]
 }
 ```
@@ -481,14 +794,22 @@ Response
 #### Export account from keystore
    Export a private key from the keystore. The exported private key is encrypted with the original passphrase. When the
    key is imported later this passphrase is required.
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> upstream/master
 #### Arguments
   - account [address]: export private key that is associated with this account
 
 #### Result
   - exported key, see [web3 keystore format](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) for
   more information
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> upstream/master
 #### Sample call
 ```json
 {
@@ -530,8 +851,11 @@ Response
 }
 ```
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> upstream/master
 ## UI API
 
 These methods needs to be implemented by a UI listener.
@@ -542,13 +866,21 @@ See `pythonsigner`, which can be invoked via `python3 pythonsigner.py test` to p
 
 All methods in this API uses object-based parameters, so that there can be no mixups of parameters: each piece of data is accessed by key.
 
+<<<<<<< HEAD
 See the [ui api changelog](intapi_changelog.md) for information about changes to this API.
+=======
+See the [ui API changelog](intapi_changelog.md) for information about changes to this API.
+>>>>>>> upstream/master
 
 OBS! A slight deviation from `json` standard is in place: every request and response should be confined to a single line.
 Whereas the `json` specification allows for linebreaks, linebreaks __should not__ be used in this communication channel, to make
 things simpler for both parties.
 
+<<<<<<< HEAD
 ### ApproveTx
+=======
+### ApproveTx / `ui_approveTx`
+>>>>>>> upstream/master
 
 Invoked when there's a transaction for approval.
 
@@ -560,13 +892,21 @@ Here's a method invocation:
 
 curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","method":"account_signTransaction","params":[{"from":"0x694267f14675d7e1b9494fd8d72fefe1755710fa","gas":"0x333","gasPrice":"0x1","nonce":"0x0","to":"0x07a565b7ed7d7a678680a4c162885bedbb695fe0", "value":"0x0", "data":"0x4401a6e40000000000000000000000000000000000000000000000000000000000000012"},"safeSend(address)"],"id":67}' http://localhost:8550/
 ```
+<<<<<<< HEAD
 
+=======
+Results in the following invocation on the UI:
+>>>>>>> upstream/master
 ```json
 
 {
   "jsonrpc": "2.0",
   "id": 1,
+<<<<<<< HEAD
   "method": "ApproveTx",
+=======
+  "method": "ui_approveTx",
+>>>>>>> upstream/master
   "params": [
     {
       "transaction": {
@@ -611,7 +951,11 @@ curl -i -H "Content-Type: application/json" -X POST --data '{"jsonrpc":"2.0","me
 {
   "jsonrpc": "2.0",
   "id": 1,
+<<<<<<< HEAD
   "method": "ApproveTx",
+=======
+  "method": "ui_approveTx",
+>>>>>>> upstream/master
   "params": [
     {
       "transaction": {
@@ -654,7 +998,11 @@ One which has missing `to`, but with no `data`:
 {
   "jsonrpc": "2.0",
   "id": 3,
+<<<<<<< HEAD
   "method": "ApproveTx",
+=======
+  "method": "ui_approveTx",
+>>>>>>> upstream/master
   "params": [
     {
       "transaction": {
@@ -683,6 +1031,7 @@ One which has missing `to`, but with no `data`:
 }
 ```
 
+<<<<<<< HEAD
 ### ApproveExport
 
 Invoked when a request to export an account has been made.
@@ -710,6 +1059,9 @@ Invoked when a request to export an account has been made.
 ```
 
 ### ApproveListing
+=======
+### ApproveListing / `ui_approveListing`
+>>>>>>> upstream/master
 
 Invoked when a request for account listing has been made.
 
@@ -720,7 +1072,11 @@ Invoked when a request for account listing has been made.
 {
   "jsonrpc": "2.0",
   "id": 5,
+<<<<<<< HEAD
   "method": "ApproveListing",
+=======
+  "method": "ui_approveListing",
+>>>>>>> upstream/master
   "params": [
     {
       "accounts": [
@@ -747,7 +1103,11 @@ Invoked when a request for account listing has been made.
 ```
 
 
+<<<<<<< HEAD
 ### ApproveSignData
+=======
+### ApproveSignData / `ui_approveSignData`
+>>>>>>> upstream/master
 
 #### Sample call
 
@@ -755,7 +1115,11 @@ Invoked when a request for account listing has been made.
 {
   "jsonrpc": "2.0",
   "id": 4,
+<<<<<<< HEAD
   "method": "ApproveSignData",
+=======
+  "method": "ui_approveSignData",
+>>>>>>> upstream/master
   "params": [
     {
       "address": "0x123409812340981234098123409812deadbeef42",
@@ -773,7 +1137,11 @@ Invoked when a request for account listing has been made.
 
 ```
 
+<<<<<<< HEAD
 ### ShowInfo
+=======
+### ShowInfo / `ui_showInfo`
+>>>>>>> upstream/master
 
 The UI should show the info to the user. Does not expect response.
 
@@ -783,7 +1151,11 @@ The UI should show the info to the user. Does not expect response.
 {
   "jsonrpc": "2.0",
   "id": 9,
+<<<<<<< HEAD
   "method": "ShowInfo",
+=======
+  "method": "ui_showInfo",
+>>>>>>> upstream/master
   "params": [
     {
       "text": "Tests completed"
@@ -793,7 +1165,11 @@ The UI should show the info to the user. Does not expect response.
 
 ```
 
+<<<<<<< HEAD
 ### ShowError
+=======
+### ShowError / `ui_showError`
+>>>>>>> upstream/master
 
 The UI should show the info to the user. Does not expect response.
 
@@ -812,7 +1188,11 @@ The UI should show the info to the user. Does not expect response.
 
 ```
 
+<<<<<<< HEAD
 ### OnApproved
+=======
+### OnApprovedTx / `ui_onApprovedTx`
+>>>>>>> upstream/master
 
 `OnApprovedTx` is called when a transaction has been approved and signed. The call contains the return value that will be sent to the external caller.  The return value from this method is ignored - the reason for having this callback is to allow the ruleset to keep track of approved transactions.
 
@@ -820,9 +1200,15 @@ When implementing rate-limited rules, this callback should be used.
 
 TLDR; Use this method to keep track of signed transactions, instead of using the data in `ApproveTx`.
 
+<<<<<<< HEAD
 ### OnSignerStartup
 
 This method provide the UI with information about what API version the signer uses (both internal and external) aswell as build-info and external api,
+=======
+### OnSignerStartup / `ui_onSignerStartup`
+
+This method provide the UI with information about what API version the signer uses (both internal and external) aswell as build-info and external API,
+>>>>>>> upstream/master
 in k/v-form.
 
 Example call:
@@ -831,7 +1217,11 @@ Example call:
 {
   "jsonrpc": "2.0",
   "id": 1,
+<<<<<<< HEAD
   "method": "OnSignerStartup",
+=======
+  "method": "ui_onSignerStartup",
+>>>>>>> upstream/master
   "params": [
     {
       "info": {
@@ -866,9 +1256,15 @@ A UI should conform to the following rules.
 along with the UI.
 
 
+<<<<<<< HEAD
 ### UI Implementations 
 
 There are a couple of implementation for a UI. We'll try to keep this list up to date. 
+=======
+### UI Implementations
+
+There are a couple of implementation for a UI. We'll try to keep this list up to date.
+>>>>>>> upstream/master
 
 | Name | Repo | UI type| No external resources| Blocky support| Verifies permissions | Hash information | No secondary storage | Statically linked| Can modify parameters|
 | ---- | ---- | -------| ---- | ---- | ---- |---- | ---- | ---- | ---- |

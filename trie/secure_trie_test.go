@@ -22,6 +22,7 @@ import (
 	"sync"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/ethdb"
@@ -29,15 +30,29 @@ import (
 
 func newEmptySecure() *SecureTrie {
 	trie, _ := NewSecure(common.Hash{}, NewDatabase(ethdb.NewMemDatabase()), 0)
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+)
+
+func newEmptySecure() *SecureTrie {
+	trie, _ := NewSecure(common.Hash{}, NewDatabase(memorydb.New()))
+>>>>>>> upstream/master
 	return trie
 }
 
 // makeTestSecureTrie creates a large enough secure trie for testing.
 func makeTestSecureTrie() (*Database, *SecureTrie, map[string][]byte) {
 	// Create an empty trie
+<<<<<<< HEAD
 	triedb := NewDatabase(ethdb.NewMemDatabase())
 
 	trie, _ := NewSecure(common.Hash{}, triedb, 0)
+=======
+	triedb := NewDatabase(memorydb.New())
+	trie, _ := NewSecure(common.Hash{}, triedb)
+>>>>>>> upstream/master
 
 	// Fill it with some arbitrary data
 	content := make(map[string][]byte)

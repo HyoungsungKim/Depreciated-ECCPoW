@@ -1,4 +1,5 @@
 // Copyright 2018 The go-ethereum Authors
+<<<<<<< HEAD
 // This file is part of go-ethereum.
 //
 // go-ethereum is free software: you can redistribute it and/or modify
@@ -13,6 +14,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+=======
+// This file is part of the go-ethereum library.
+//
+// The go-ethereum library is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// The go-ethereum library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+>>>>>>> upstream/master
 
 package rules
 
@@ -22,12 +39,20 @@ import (
 	"os"
 	"strings"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/internal/ethapi"
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/signer/core"
 	"github.com/Onther-Tech/go-ethereum/signer/rules/deps"
 	"github.com/Onther-Tech/go-ethereum/signer/storage"
+=======
+	"github.com/ethereum/go-ethereum/internal/ethapi"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/signer/core"
+	"github.com/ethereum/go-ethereum/signer/rules/deps"
+	"github.com/ethereum/go-ethereum/signer/storage"
+>>>>>>> upstream/master
 	"github.com/robertkrimen/otto"
 )
 
@@ -42,6 +67,7 @@ func consoleOutput(call otto.FunctionCall) otto.Value {
 	for _, argument := range call.ArgumentList {
 		output = append(output, fmt.Sprintf("%v", argument))
 	}
+<<<<<<< HEAD
 	fmt.Fprintln(os.Stdout, strings.Join(output, " "))
 	return otto.Value{}
 }
@@ -61,10 +87,35 @@ func NewRuleEvaluator(next core.SignerUI, jsbackend, credentialsBackend storage.
 		storage:     jsbackend,
 		credentials: credentialsBackend,
 		jsRules:     "",
+=======
+	fmt.Fprintln(os.Stderr, strings.Join(output, " "))
+	return otto.Value{}
+}
+
+// rulesetUI provides an implementation of UIClientAPI that evaluates a javascript
+// file for each defined UI-method
+type rulesetUI struct {
+	next    core.UIClientAPI // The next handler, for manual processing
+	storage storage.Storage
+	jsRules string // The rules to use
+}
+
+func NewRuleEvaluator(next core.UIClientAPI, jsbackend storage.Storage) (*rulesetUI, error) {
+	c := &rulesetUI{
+		next:    next,
+		storage: jsbackend,
+		jsRules: "",
+>>>>>>> upstream/master
 	}
 
 	return c, nil
 }
+<<<<<<< HEAD
+=======
+func (r *rulesetUI) RegisterUIServer(api *core.UIServerAPI) {
+	// TODO, make it possible to query from js
+}
+>>>>>>> upstream/master
 
 func (r *rulesetUI) Init(javascriptRules string) error {
 	r.jsRules = javascriptRules
@@ -74,12 +125,36 @@ func (r *rulesetUI) execute(jsfunc string, jsarg interface{}) (otto.Value, error
 
 	// Instantiate a fresh vm engine every time
 	vm := otto.New()
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 	// Set the native callbacks
 	consoleObj, _ := vm.Get("console")
 	consoleObj.Object().Set("log", consoleOutput)
 	consoleObj.Object().Set("error", consoleOutput)
+<<<<<<< HEAD
 	vm.Set("storage", r.storage)
 
+=======
+
+	vm.Set("storage", struct{}{})
+	storageObj, _ := vm.Get("storage")
+	storageObj.Object().Set("put", func(call otto.FunctionCall) otto.Value {
+		key, val := call.Argument(0).String(), call.Argument(1).String()
+		if val == "" {
+			r.storage.Del(key)
+		} else {
+			r.storage.Put(key, val)
+		}
+		return otto.NullValue()
+	})
+	storageObj.Object().Set("get", func(call otto.FunctionCall) otto.Value {
+		goval, _ := r.storage.Get(call.Argument(0).String())
+		jsval, _ := otto.ToValue(goval)
+		return jsval
+	})
+>>>>>>> upstream/master
 	// Load bootstrap libraries
 	script, err := vm.Compile("bignumber.js", BigNumber_JS)
 	if err != nil {
@@ -150,18 +225,25 @@ func (r *rulesetUI) ApproveTx(request *core.SignTxRequest) (core.SignTxResponse,
 	if approved {
 		return core.SignTxResponse{
 				Transaction: request.Transaction,
+<<<<<<< HEAD
 				Approved:    true,
 				Password:    r.lookupPassword(request.Transaction.From.Address()),
 			},
+=======
+				Approved:    true},
+>>>>>>> upstream/master
 			nil
 	}
 	return core.SignTxResponse{Approved: false}, err
 }
 
+<<<<<<< HEAD
 func (r *rulesetUI) lookupPassword(address common.Address) string {
 	return r.credentials.Get(strings.ToLower(address.String()))
 }
 
+=======
+>>>>>>> upstream/master
 func (r *rulesetUI) ApproveSignData(request *core.SignDataRequest) (core.SignDataResponse, error) {
 	jsonreq, err := json.Marshal(request)
 	approved, err := r.checkApproval("ApproveSignData", jsonreq, err)
@@ -170,6 +252,7 @@ func (r *rulesetUI) ApproveSignData(request *core.SignDataRequest) (core.SignDat
 		return r.next.ApproveSignData(request)
 	}
 	if approved {
+<<<<<<< HEAD
 		return core.SignDataResponse{Approved: true, Password: r.lookupPassword(request.Address.Address())}, nil
 	}
 	return core.SignDataResponse{Approved: false, Password: ""}, err
@@ -192,6 +275,11 @@ func (r *rulesetUI) ApproveImport(request *core.ImportRequest) (core.ImportRespo
 	// This cannot be handled by rules, requires setting a password
 	// dispatch to next
 	return r.next.ApproveImport(request)
+=======
+		return core.SignDataResponse{Approved: true}, nil
+	}
+	return core.SignDataResponse{Approved: false}, err
+>>>>>>> upstream/master
 }
 
 // OnInputRequired not handled by rules

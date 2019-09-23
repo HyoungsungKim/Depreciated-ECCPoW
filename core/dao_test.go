@@ -20,10 +20,17 @@ import (
 	"math/big"
 	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/consensus/ethash"
 	"github.com/Onther-Tech/go-ethereum/core/vm"
 	"github.com/Onther-Tech/go-ethereum/ethdb"
 	"github.com/Onther-Tech/go-ethereum/params"
+=======
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/params"
+>>>>>>> upstream/master
 )
 
 // Tests that DAO-fork enabled clients can properly filter out fork-commencing
@@ -32,13 +39,21 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	forkBlock := big.NewInt(32)
 
 	// Generate a common prefix for both pro-forkers and non-forkers
+<<<<<<< HEAD
 	db := ethdb.NewMemDatabase()
+=======
+	db := rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 	gspec := new(Genesis)
 	genesis := gspec.MustCommit(db)
 	prefix, _ := GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, int(forkBlock.Int64()-1), func(i int, gen *BlockGen) {})
 
 	// Create the concurrent, conflicting two nodes
+<<<<<<< HEAD
 	proDb := ethdb.NewMemDatabase()
+=======
+	proDb := rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 	gspec.MustCommit(proDb)
 
 	proConf := *params.TestChainConfig
@@ -48,7 +63,11 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	proBc, _ := NewBlockChain(proDb, nil, &proConf, ethash.NewFaker(), vm.Config{}, nil)
 	defer proBc.Stop()
 
+<<<<<<< HEAD
 	conDb := ethdb.NewMemDatabase()
+=======
+	conDb := rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 	gspec.MustCommit(conDb)
 
 	conConf := *params.TestChainConfig
@@ -67,7 +86,11 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	// Try to expand both pro-fork and non-fork chains iteratively with other camp's blocks
 	for i := int64(0); i < params.DAOForkExtraRange.Int64(); i++ {
 		// Create a pro-fork block, and try to feed into the no-fork chain
+<<<<<<< HEAD
 		db = ethdb.NewMemDatabase()
+=======
+		db = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		gspec.MustCommit(db)
 		bc, _ := NewBlockChain(db, nil, &conConf, ethash.NewFaker(), vm.Config{}, nil)
 		defer bc.Stop()
@@ -92,7 +115,11 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 			t.Fatalf("contra-fork chain didn't accepted no-fork block: %v", err)
 		}
 		// Create a no-fork block, and try to feed into the pro-fork chain
+<<<<<<< HEAD
 		db = ethdb.NewMemDatabase()
+=======
+		db = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		gspec.MustCommit(db)
 		bc, _ = NewBlockChain(db, nil, &proConf, ethash.NewFaker(), vm.Config{}, nil)
 		defer bc.Stop()
@@ -118,7 +145,11 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 		}
 	}
 	// Verify that contra-forkers accept pro-fork extra-datas after forking finishes
+<<<<<<< HEAD
 	db = ethdb.NewMemDatabase()
+=======
+	db = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 	gspec.MustCommit(db)
 	bc, _ := NewBlockChain(db, nil, &conConf, ethash.NewFaker(), vm.Config{}, nil)
 	defer bc.Stop()
@@ -138,7 +169,11 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 		t.Fatalf("contra-fork chain didn't accept pro-fork block post-fork: %v", err)
 	}
 	// Verify that pro-forkers accept contra-fork extra-datas after forking finishes
+<<<<<<< HEAD
 	db = ethdb.NewMemDatabase()
+=======
+	db = rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 	gspec.MustCommit(db)
 	bc, _ = NewBlockChain(db, nil, &proConf, ethash.NewFaker(), vm.Config{}, nil)
 	defer bc.Stop()

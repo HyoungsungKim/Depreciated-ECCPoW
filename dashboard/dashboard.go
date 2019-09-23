@@ -18,8 +18,10 @@ package dashboard
 
 //go:generate yarn --cwd ./assets install
 //go:generate yarn --cwd ./assets build
-//go:generate go-bindata -nometadata -o assets.go -prefix assets -nocompress -pkg dashboard assets/index.html assets/bundle.js
+//go:generate yarn --cwd ./assets js-beautify -f bundle.js.map -r -w 1
+//go:generate go-bindata -nometadata -o assets.go -prefix assets -nocompress -pkg dashboard assets/index.html assets/bundle.js assets/bundle.js.map
 //go:generate sh -c "sed 's#var _bundleJs#//nolint:misspell\\\n&#' assets.go > assets.go.tmp && mv assets.go.tmp assets.go"
+//go:generate sh -c "sed 's#var _bundleJsMap#//nolint:misspell\\\n&#' assets.go > assets.go.tmp && mv assets.go.tmp assets.go"
 //go:generate sh -c "sed 's#var _indexHtml#//nolint:misspell\\\n&#' assets.go > assets.go.tmp && mv assets.go.tmp assets.go"
 //go:generate gofmt -w -s assets.go
 
@@ -27,49 +29,62 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"io"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/metrics"
 	"github.com/Onther-Tech/go-ethereum/p2p"
 	"github.com/Onther-Tech/go-ethereum/params"
 	"github.com/Onther-Tech/go-ethereum/rpc"
 	"github.com/elastic/gosigar"
+=======
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 	"github.com/mohae/deepcopy"
 	"golang.org/x/net/websocket"
 )
 
 const (
-	activeMemorySampleLimit   = 200 // Maximum number of active memory data samples
-	virtualMemorySampleLimit  = 200 // Maximum number of virtual memory data samples
-	networkIngressSampleLimit = 200 // Maximum number of network ingress data samples
-	networkEgressSampleLimit  = 200 // Maximum number of network egress data samples
-	processCPUSampleLimit     = 200 // Maximum number of process cpu data samples
-	systemCPUSampleLimit      = 200 // Maximum number of system cpu data samples
-	diskReadSampleLimit       = 200 // Maximum number of disk read data samples
-	diskWriteSampleLimit      = 200 // Maximum number of disk write data samples
+	sampleLimit = 200 // Maximum number of data samples
 )
-
-var nextID uint32 // Next connection id
 
 // Dashboard contains the dashboard internals.
 type Dashboard struct {
-	config *Config
+	config *Config // Configuration values for the dashboard
 
+	listener   net.Listener       // Network listener listening for dashboard clients
+	conns      map[uint32]*client // Currently live websocket connections
+	nextConnID uint32             // Next connection id
+
+<<<<<<< HEAD
 	listener net.Listener
 	conns    map[uint32]*client // Currently live websocket connections
 	history  *Message
 	lock     sync.RWMutex // Lock protecting the dashboard's internals
+=======
+	history *Message // Stored historical data
+
+	lock     sync.Mutex   // Lock protecting the dashboard's internals
+	sysLock  sync.RWMutex // Lock protecting the stored system data
+	peerLock sync.RWMutex // Lock protecting the stored peer data
+	logLock  sync.RWMutex // Lock protecting the stored log data
+
+	geodb  *geoDB // geoip database instance for IP to geographical information conversions
+	logdir string // Directory containing the log files
+>>>>>>> upstream/master
 
 	logdir string
 
 	quit chan chan error // Channel used for graceful exit
-	wg   sync.WaitGroup
+	wg   sync.WaitGroup  // Wait group used to close the data collector threads
 }
 
 // client represents active websocket connection with a remote browser.
@@ -96,6 +111,7 @@ func New(config *Config, commit string, logdir string) *Dashboard {
 				Version: fmt.Sprintf("v%d.%d.%d%s", params.VersionMajor, params.VersionMinor, params.VersionPatch, versionMeta),
 			},
 			System: &SystemMessage{
+<<<<<<< HEAD
 				ActiveMemory:   emptyChartEntries(now, activeMemorySampleLimit, config.Refresh),
 				VirtualMemory:  emptyChartEntries(now, virtualMemorySampleLimit, config.Refresh),
 				NetworkIngress: emptyChartEntries(now, networkIngressSampleLimit, config.Refresh),
@@ -104,6 +120,16 @@ func New(config *Config, commit string, logdir string) *Dashboard {
 				SystemCPU:      emptyChartEntries(now, systemCPUSampleLimit, config.Refresh),
 				DiskRead:       emptyChartEntries(now, diskReadSampleLimit, config.Refresh),
 				DiskWrite:      emptyChartEntries(now, diskWriteSampleLimit, config.Refresh),
+=======
+				ActiveMemory:   emptyChartEntries(now, sampleLimit),
+				VirtualMemory:  emptyChartEntries(now, sampleLimit),
+				NetworkIngress: emptyChartEntries(now, sampleLimit),
+				NetworkEgress:  emptyChartEntries(now, sampleLimit),
+				ProcessCPU:     emptyChartEntries(now, sampleLimit),
+				SystemCPU:      emptyChartEntries(now, sampleLimit),
+				DiskRead:       emptyChartEntries(now, sampleLimit),
+				DiskWrite:      emptyChartEntries(now, sampleLimit),
+>>>>>>> upstream/master
 			},
 		},
 		logdir: logdir,
@@ -111,12 +137,10 @@ func New(config *Config, commit string, logdir string) *Dashboard {
 }
 
 // emptyChartEntries returns a ChartEntry array containing limit number of empty samples.
-func emptyChartEntries(t time.Time, limit int, refresh time.Duration) ChartEntries {
+func emptyChartEntries(t time.Time, limit int) ChartEntries {
 	ce := make(ChartEntries, limit)
 	for i := 0; i < limit; i++ {
-		ce[i] = &ChartEntry{
-			Time: t.Add(-time.Duration(i) * refresh),
-		}
+		ce[i] = new(ChartEntry)
 	}
 	return ce
 }
@@ -132,9 +156,16 @@ func (db *Dashboard) APIs() []rpc.API { return nil }
 func (db *Dashboard) Start(server *p2p.Server) error {
 	log.Info("Starting dashboard")
 
+<<<<<<< HEAD
 	db.wg.Add(2)
 	go db.collectData()
 	go db.streamLogs()
+=======
+	db.wg.Add(3)
+	go db.collectSystemData()
+	go db.streamLogs()
+	go db.collectPeerData()
+>>>>>>> upstream/master
 
 	http.HandleFunc("/", db.webHandler)
 	http.Handle("/api", websocket.Handler(db.apiHandler))
@@ -160,7 +191,7 @@ func (db *Dashboard) Stop() error {
 	}
 	// Close the collectors.
 	errc := make(chan error, 1)
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 3; i++ {
 		db.quit <- errc
 		if err := <-errc; err != nil {
 			errs = append(errs, err)
@@ -206,7 +237,7 @@ func (db *Dashboard) webHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiHandler handles requests for the dashboard.
 func (db *Dashboard) apiHandler(conn *websocket.Conn) {
-	id := atomic.AddUint32(&nextID, 1)
+	id := atomic.AddUint32(&db.nextConnID, 1)
 	client := &client{
 		conn:   conn,
 		msg:    make(chan *Message, 128),
@@ -233,9 +264,25 @@ func (db *Dashboard) apiHandler(conn *websocket.Conn) {
 		}
 	}()
 
+<<<<<<< HEAD
 	db.lock.Lock()
 	// Send the past data.
 	client.msg <- deepcopy.Copy(db.history).(*Message)
+=======
+	// Send the past data.
+	db.sysLock.RLock()
+	db.peerLock.RLock()
+	db.logLock.RLock()
+
+	h := deepcopy.Copy(db.history).(*Message)
+
+	db.sysLock.RUnlock()
+	db.peerLock.RUnlock()
+	db.logLock.RUnlock()
+
+	client.msg <- h
+
+>>>>>>> upstream/master
 	// Start tracking the connection and drop at connection loss.
 	db.conns[id] = client
 	db.lock.Unlock()
@@ -259,6 +306,7 @@ func (db *Dashboard) apiHandler(conn *websocket.Conn) {
 	}
 }
 
+<<<<<<< HEAD
 // meterCollector returns a function, which retrieves a specific meter.
 func meterCollector(name string) func() int64 {
 	if metric := metrics.DefaultRegistry.Get(name); metric != nil {
@@ -389,6 +437,8 @@ func (db *Dashboard) collectData() {
 	}
 }
 
+=======
+>>>>>>> upstream/master
 // sendToAll sends the given message to the active dashboards.
 func (db *Dashboard) sendToAll(msg *Message) {
 	db.lock.Lock()

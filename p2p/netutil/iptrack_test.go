@@ -22,7 +22,11 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/mclock"
+=======
+	"github.com/ethereum/go-ethereum/common/mclock"
+>>>>>>> upstream/master
 )
 
 const (

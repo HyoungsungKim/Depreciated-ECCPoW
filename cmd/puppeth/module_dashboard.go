@@ -608,6 +608,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		bootPython[i] = "'" + boot + "'"
 	}
 	template.Must(template.New("").Parse(dashboardContent)).Execute(indexfile, map[string]interface{}{
+<<<<<<< HEAD
 		"Network":          network,
 		"NetworkID":        conf.Genesis.Config.ChainID,
 		"NetworkTitle":     strings.Title(network),
@@ -632,6 +633,33 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"Spurious":         conf.Genesis.Config.EIP155Block,
 		"Byzantium":        conf.Genesis.Config.ByzantiumBlock,
 		"Constantinople":   conf.Genesis.Config.ConstantinopleBlock,
+=======
+		"Network":           network,
+		"NetworkID":         conf.Genesis.Config.ChainID,
+		"NetworkTitle":      strings.Title(network),
+		"EthstatsPage":      config.ethstats,
+		"ExplorerPage":      config.explorer,
+		"WalletPage":        config.wallet,
+		"FaucetPage":        config.faucet,
+		"GethGenesis":       network + ".json",
+		"Bootnodes":         conf.bootnodes,
+		"BootnodesFlat":     strings.Join(conf.bootnodes, ","),
+		"Ethstats":          statsLogin,
+		"Ethash":            conf.Genesis.Config.Ethash != nil,
+		"CppGenesis":        network + "-cpp.json",
+		"CppBootnodes":      strings.Join(bootCpp, " "),
+		"HarmonyGenesis":    network + "-harmony.json",
+		"HarmonyBootnodes":  strings.Join(bootHarmony, " "),
+		"ParityGenesis":     network + "-parity.json",
+		"PythonGenesis":     network + "-python.json",
+		"PythonBootnodes":   strings.Join(bootPython, ","),
+		"Homestead":         conf.Genesis.Config.HomesteadBlock,
+		"Tangerine":         conf.Genesis.Config.EIP150Block,
+		"Spurious":          conf.Genesis.Config.EIP155Block,
+		"Byzantium":         conf.Genesis.Config.ByzantiumBlock,
+		"Constantinople":    conf.Genesis.Config.ConstantinopleBlock,
+		"ConstantinopleFix": conf.Genesis.Config.PetersburgBlock,
+>>>>>>> upstream/master
 	})
 	files[filepath.Join(workdir, "index.html")] = indexfile.Bytes()
 

@@ -20,6 +20,7 @@ import (
 	"hash"
 	"sync"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/crypto/sha3"
 	"github.com/Onther-Tech/go-ethereum/rlp"
@@ -31,6 +32,36 @@ type hasher struct {
 	cachegen   uint16
 	cachelimit uint16
 	onleaf     LeafCallback
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rlp"
+	"golang.org/x/crypto/sha3"
+)
+
+type hasher struct {
+	tmp    sliceBuffer
+	sha    keccakState
+	onleaf LeafCallback
+}
+
+// keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
+// Read to get a variable amount of data from the hash state. Read is faster than Sum
+// because it doesn't copy the internal state, but also modifies the internal state.
+type keccakState interface {
+	hash.Hash
+	Read([]byte) (int, error)
+}
+
+type sliceBuffer []byte
+
+func (b *sliceBuffer) Write(data []byte) (n int, err error) {
+	*b = append(*b, data...)
+	return len(data), nil
+}
+
+func (b *sliceBuffer) Reset() {
+	*b = (*b)[:0]
+>>>>>>> upstream/master
 }
 
 // keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
@@ -57,14 +88,18 @@ var hasherPool = sync.Pool{
 	New: func() interface{} {
 		return &hasher{
 			tmp: make(sliceBuffer, 0, 550), // cap is as large as a full fullNode.
+<<<<<<< HEAD
 			sha: sha3.NewKeccak256().(keccakState),
+=======
+			sha: sha3.NewLegacyKeccak256().(keccakState),
+>>>>>>> upstream/master
 		}
 	},
 }
 
-func newHasher(cachegen, cachelimit uint16, onleaf LeafCallback) *hasher {
+func newHasher(onleaf LeafCallback) *hasher {
 	h := hasherPool.Get().(*hasher)
-	h.cachegen, h.cachelimit, h.onleaf = cachegen, cachelimit, onleaf
+	h.onleaf = onleaf
 	return h
 }
 
@@ -80,14 +115,13 @@ func (h *hasher) hash(n node, db *Database, force bool) (node, node, error) {
 		if db == nil {
 			return hash, n, nil
 		}
-		if n.canUnload(h.cachegen, h.cachelimit) {
-			// Unload the node from cache. All of its subnodes will have a lower or equal
-			// cache generation number.
-			cacheUnloadCounter.Inc(1)
-			return hash, hash, nil
-		}
 		if !dirty {
-			return hash, n, nil
+			switch n.(type) {
+			case *fullNode, *shortNode:
+				return hash, hash, nil
+			default:
+				return hash, n, nil
+			}
 		}
 	}
 	// Trie not processed yet or needs storage, walk the children

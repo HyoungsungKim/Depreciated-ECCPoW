@@ -32,7 +32,11 @@ func (s *cacheShard) get(key string, hashedKey uint64) ([]byte, error) {
 	if itemIndex == 0 {
 		s.lock.RUnlock()
 		s.miss()
+<<<<<<< HEAD
 		return nil, notFound(key)
+=======
+		return nil, ErrEntryNotFound
+>>>>>>> upstream/master
 	}
 
 	wrappedEntry, err := s.entries.Get(int(itemIndex))
@@ -47,11 +51,20 @@ func (s *cacheShard) get(key string, hashedKey uint64) ([]byte, error) {
 		}
 		s.lock.RUnlock()
 		s.collision()
+<<<<<<< HEAD
 		return nil, notFound(key)
 	}
 	s.lock.RUnlock()
 	s.hit()
 	return readEntry(wrappedEntry), nil
+=======
+		return nil, ErrEntryNotFound
+	}
+	entry := readEntry(wrappedEntry)
+	s.lock.RUnlock()
+	s.hit()
+	return entry, nil
+>>>>>>> upstream/master
 }
 
 func (s *cacheShard) set(key string, hashedKey uint64, entry []byte) error {
@@ -85,17 +98,28 @@ func (s *cacheShard) set(key string, hashedKey uint64, entry []byte) error {
 }
 
 func (s *cacheShard) del(key string, hashedKey uint64) error {
+<<<<<<< HEAD
+=======
+	// Optimistic pre-check using only readlock
+>>>>>>> upstream/master
 	s.lock.RLock()
 	itemIndex := s.hashmap[hashedKey]
 
 	if itemIndex == 0 {
 		s.lock.RUnlock()
 		s.delmiss()
+<<<<<<< HEAD
 		return notFound(key)
 	}
 
 	wrappedEntry, err := s.entries.Get(int(itemIndex))
 	if err != nil {
+=======
+		return ErrEntryNotFound
+	}
+
+	if err := s.entries.CheckGet(int(itemIndex)); err != nil {
+>>>>>>> upstream/master
 		s.lock.RUnlock()
 		s.delmiss()
 		return err
@@ -104,6 +128,26 @@ func (s *cacheShard) del(key string, hashedKey uint64) error {
 
 	s.lock.Lock()
 	{
+<<<<<<< HEAD
+=======
+		// After obtaining the writelock, we need to read the same again,
+		// since the data delivered earlier may be stale now
+		itemIndex = s.hashmap[hashedKey]
+
+		if itemIndex == 0 {
+			s.lock.Unlock()
+			s.delmiss()
+			return ErrEntryNotFound
+		}
+
+		wrappedEntry, err := s.entries.Get(int(itemIndex))
+		if err != nil {
+			s.lock.Unlock()
+			s.delmiss()
+			return err
+		}
+
+>>>>>>> upstream/master
 		delete(s.hashmap, hashedKey)
 		s.onRemove(wrappedEntry, Deleted)
 		resetKeyFromEntry(wrappedEntry)
@@ -136,10 +180,16 @@ func (s *cacheShard) cleanUp(currentTimestamp uint64) {
 }
 
 func (s *cacheShard) getOldestEntry() ([]byte, error) {
+<<<<<<< HEAD
+=======
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+>>>>>>> upstream/master
 	return s.entries.Peek()
 }
 
 func (s *cacheShard) getEntry(index int) ([]byte, error) {
+<<<<<<< HEAD
 	return s.entries.Get(index)
 }
 
@@ -147,6 +197,18 @@ func (s *cacheShard) copyKeys() (keys []uint32, next int) {
 	keys = make([]uint32, len(s.hashmap))
 
 	s.lock.RLock()
+=======
+	s.lock.RLock()
+	entry, err := s.entries.Get(index)
+	s.lock.RUnlock()
+
+	return entry, err
+}
+
+func (s *cacheShard) copyKeys() (keys []uint32, next int) {
+	s.lock.RLock()
+	keys = make([]uint32, len(s.hashmap))
+>>>>>>> upstream/master
 
 	for _, index := range s.hashmap {
 		keys[next] = index

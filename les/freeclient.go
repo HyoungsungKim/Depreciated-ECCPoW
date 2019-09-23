@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Copyright 2016 The go-ethereum Authors
+=======
+// Copyright 2018 The go-ethereum Authors
+>>>>>>> upstream/master
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -14,12 +18,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<< HEAD
 // Package les implements the Light Ethereum Subprotocol.
+=======
+>>>>>>> upstream/master
 package les
 
 import (
 	"io"
 	"math"
+<<<<<<< HEAD
 	"sync"
 	"time"
 
@@ -28,6 +36,17 @@ import (
 	"github.com/Onther-Tech/go-ethereum/ethdb"
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"net"
+	"sync"
+	"time"
+
+	"github.com/ethereum/go-ethereum/common/mclock"
+	"github.com/ethereum/go-ethereum/common/prque"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/rlp"
+>>>>>>> upstream/master
 )
 
 // freeClientPool implements a client database that limits the connection time
@@ -44,12 +63,24 @@ import (
 // value for the client. Currently the LES protocol manager uses IP addresses
 // (without port address) to identify clients.
 type freeClientPool struct {
+<<<<<<< HEAD
 	db     ethdb.Database
 	lock   sync.Mutex
 	clock  mclock.Clock
 	closed bool
 
 	connectedLimit, totalLimit int
+=======
+	db         ethdb.Database
+	lock       sync.Mutex
+	clock      mclock.Clock
+	closed     bool
+	removePeer func(string)
+
+	connectedLimit, totalLimit int
+	freeClientCap              uint64
+	connectedCap               uint64
+>>>>>>> upstream/master
 
 	addressMap            map[string]*freeClientPoolEntry
 	connPool, disconnPool *prque.Prque
@@ -64,6 +95,7 @@ const (
 )
 
 // newFreeClientPool creates a new free client pool
+<<<<<<< HEAD
 func newFreeClientPool(db ethdb.Database, connectedLimit, totalLimit int, clock mclock.Clock) *freeClientPool {
 	pool := &freeClientPool{
 		db:             db,
@@ -73,6 +105,18 @@ func newFreeClientPool(db ethdb.Database, connectedLimit, totalLimit int, clock 
 		disconnPool:    prque.New(poolSetIndex),
 		connectedLimit: connectedLimit,
 		totalLimit:     totalLimit,
+=======
+func newFreeClientPool(db ethdb.Database, freeClientCap uint64, totalLimit int, clock mclock.Clock, removePeer func(string)) *freeClientPool {
+	pool := &freeClientPool{
+		db:            db,
+		clock:         clock,
+		addressMap:    make(map[string]*freeClientPoolEntry),
+		connPool:      prque.New(poolSetIndex),
+		disconnPool:   prque.New(poolSetIndex),
+		freeClientCap: freeClientCap,
+		totalLimit:    totalLimit,
+		removePeer:    removePeer,
+>>>>>>> upstream/master
 	}
 	pool.loadFromDb()
 	return pool
@@ -85,22 +129,63 @@ func (f *freeClientPool) stop() {
 	f.lock.Unlock()
 }
 
+<<<<<<< HEAD
 // connect should be called after a successful handshake. If the connection was
 // rejected, there is no need to call disconnect.
 //
 // Note: the disconnectFn callback should not block.
 func (f *freeClientPool) connect(address string, disconnectFn func()) bool {
+=======
+// freeClientId returns a string identifier for the peer. Multiple peers with the
+// same identifier can not be in the free client pool simultaneously.
+func freeClientId(p *peer) string {
+	if addr, ok := p.RemoteAddr().(*net.TCPAddr); ok {
+		if addr.IP.IsLoopback() {
+			// using peer id instead of loopback ip address allows multiple free
+			// connections from local machine to own server
+			return p.id
+		} else {
+			return addr.IP.String()
+		}
+	}
+	return ""
+}
+
+// registerPeer implements clientPool
+func (f *freeClientPool) registerPeer(p *peer) {
+	if freeId := freeClientId(p); freeId != "" {
+		if !f.connect(freeId, p.id) {
+			f.removePeer(p.id)
+		}
+	}
+}
+
+// connect should be called after a successful handshake. If the connection was
+// rejected, there is no need to call disconnect.
+func (f *freeClientPool) connect(address, id string) bool {
+>>>>>>> upstream/master
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	if f.closed {
 		return false
 	}
+<<<<<<< HEAD
+=======
+	if f.connectedLimit == 0 {
+		log.Debug("Client rejected", "address", address)
+		return false
+	}
+>>>>>>> upstream/master
 	e := f.addressMap[address]
 	now := f.clock.Now()
 	var recentUsage int64
 	if e == nil {
+<<<<<<< HEAD
 		e = &freeClientPoolEntry{address: address, index: -1}
+=======
+		e = &freeClientPoolEntry{address: address, index: -1, id: id}
+>>>>>>> upstream/master
 		f.addressMap[address] = e
 	} else {
 		if e.connected {
@@ -115,30 +200,60 @@ func (f *freeClientPool) connect(address string, disconnectFn func()) bool {
 		i := f.connPool.PopItem().(*freeClientPoolEntry)
 		if e.linUsage+int64(connectedBias)-i.linUsage < 0 {
 			// kick it out and accept the new client
+<<<<<<< HEAD
 			f.connPool.Remove(i.index)
 			f.calcLogUsage(i, now)
 			i.connected = false
 			f.disconnPool.Push(i, -i.logUsage)
 			log.Debug("Client kicked out", "address", i.address)
 			i.disconnectFn()
+=======
+			f.dropClient(i, now)
+			clientKickedMeter.Mark(1)
+			f.connectedCap -= f.freeClientCap
+>>>>>>> upstream/master
 		} else {
 			// keep the old client and reject the new one
 			f.connPool.Push(i, i.linUsage)
 			log.Debug("Client rejected", "address", address)
+<<<<<<< HEAD
+=======
+			clientRejectedMeter.Mark(1)
+>>>>>>> upstream/master
 			return false
 		}
 	}
 	f.disconnPool.Remove(e.index)
 	e.connected = true
+<<<<<<< HEAD
 	e.disconnectFn = disconnectFn
+=======
+	e.id = id
+>>>>>>> upstream/master
 	f.connPool.Push(e, e.linUsage)
 	if f.connPool.Size()+f.disconnPool.Size() > f.totalLimit {
 		f.disconnPool.Pop()
 	}
+<<<<<<< HEAD
+=======
+	f.connectedCap += f.freeClientCap
+	totalConnectedGauge.Update(int64(f.connectedCap))
+	clientConnectedMeter.Mark(1)
+>>>>>>> upstream/master
 	log.Debug("Client accepted", "address", address)
 	return true
 }
 
+<<<<<<< HEAD
+=======
+// unregisterPeer implements clientPool
+func (f *freeClientPool) unregisterPeer(p *peer) {
+	if freeId := freeClientId(p); freeId != "" {
+		f.disconnect(freeId)
+	}
+}
+
+>>>>>>> upstream/master
 // disconnect should be called when a connection is terminated. If the disconnection
 // was initiated by the pool itself using disconnectFn then calling disconnect is
 // not necessary but permitted.
@@ -149,20 +264,69 @@ func (f *freeClientPool) disconnect(address string) {
 	if f.closed {
 		return
 	}
+<<<<<<< HEAD
 	e := f.addressMap[address]
+=======
+	// Short circuit if the peer hasn't been registered.
+	e := f.addressMap[address]
+	if e == nil {
+		return
+	}
+>>>>>>> upstream/master
 	now := f.clock.Now()
 	if !e.connected {
 		log.Debug("Client already disconnected", "address", address)
 		return
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
 	f.connPool.Remove(e.index)
 	f.calcLogUsage(e, now)
 	e.connected = false
 	f.disconnPool.Push(e, -e.logUsage)
+<<<<<<< HEAD
 	log.Debug("Client disconnected", "address", address)
 }
 
+=======
+	f.connectedCap -= f.freeClientCap
+	totalConnectedGauge.Update(int64(f.connectedCap))
+	log.Debug("Client disconnected", "address", address)
+}
+
+// setConnLimit sets the maximum number of free client slots and also drops
+// some peers if necessary
+func (f *freeClientPool) setLimits(count int, totalCap uint64) {
+	f.lock.Lock()
+	defer f.lock.Unlock()
+
+	f.connectedLimit = int(totalCap / f.freeClientCap)
+	if count < f.connectedLimit {
+		f.connectedLimit = count
+	}
+	now := mclock.Now()
+	for f.connPool.Size() > f.connectedLimit {
+		i := f.connPool.PopItem().(*freeClientPoolEntry)
+		f.dropClient(i, now)
+		f.connectedCap -= f.freeClientCap
+	}
+	totalConnectedGauge.Update(int64(f.connectedCap))
+}
+
+// dropClient disconnects a client and also moves it from the connected to the
+// disconnected pool
+func (f *freeClientPool) dropClient(i *freeClientPoolEntry, now mclock.AbsTime) {
+	f.connPool.Remove(i.index)
+	f.calcLogUsage(i, now)
+	i.connected = false
+	f.disconnPool.Push(i, -i.logUsage)
+	log.Debug("Client kicked out", "address", i.address)
+	f.removePeer(i.id)
+}
+
+>>>>>>> upstream/master
 // logOffset calculates the time-dependent offset for the logarithmic
 // representation of recent usage
 func (f *freeClientPool) logOffset(now mclock.AbsTime) int64 {
@@ -245,7 +409,11 @@ func (f *freeClientPool) saveToDb() {
 // even though they are close to each other at any time they may wrap around int64
 // limits over time. Comparison should be performed accordingly.
 type freeClientPoolEntry struct {
+<<<<<<< HEAD
 	address            string
+=======
+	address, id        string
+>>>>>>> upstream/master
 	connected          bool
 	disconnectFn       func()
 	linUsage, logUsage int64

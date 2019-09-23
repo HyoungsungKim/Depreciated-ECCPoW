@@ -41,12 +41,24 @@ import (
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
 	"github.com/Onther-Tech/go-ethereum/rpc"
 	"github.com/docker/docker/pkg/reexec"
+<<<<<<< HEAD
+=======
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 	"golang.org/x/net/websocket"
 )
 
 func init() {
 	// Register a reexec function to start a simulation node when the current binary is
+<<<<<<< HEAD
 	// executed as "p2p-node" (rather than whataver the main() function would normally do).
+=======
+	// executed as "p2p-node" (rather than whatever the main() function would normally do).
+>>>>>>> upstream/master
 	reexec.Register("p2p-node", execP2PNode)
 }
 
@@ -92,17 +104,28 @@ func (e *ExecAdapter) NewNode(config *NodeConfig) (Node, error) {
 		return nil, fmt.Errorf("error creating node directory: %s", err)
 	}
 
+	err := config.initDummyEnode()
+	if err != nil {
+		return nil, err
+	}
+
 	// generate the config
 	conf := &execNodeConfig{
 		Stack: node.DefaultConfig,
 		Node:  config,
 	}
-	conf.Stack.DataDir = filepath.Join(dir, "data")
+	if config.DataDir != "" {
+		conf.Stack.DataDir = config.DataDir
+	} else {
+		conf.Stack.DataDir = filepath.Join(dir, "data")
+	}
+
+	// these parameters are crucial for execadapter node to run correctly
 	conf.Stack.WSHost = "127.0.0.1"
 	conf.Stack.WSPort = 0
 	conf.Stack.WSOrigins = []string{"*"}
 	conf.Stack.WSExposeAll = true
-	conf.Stack.P2P.EnableMsgEvents = false
+	conf.Stack.P2P.EnableMsgEvents = config.EnableMsgEvents
 	conf.Stack.P2P.NoDiscovery = true
 	conf.Stack.P2P.NAT = nil
 	conf.Stack.NoUSB = true
@@ -358,6 +381,7 @@ func execP2PNode() {
 	if statusURL == "" {
 		log.Crit("missing " + envStatusURL)
 	}
+<<<<<<< HEAD
 
 	// Start the node and gather startup report.
 	var status nodeStartupJSON
@@ -369,6 +393,19 @@ func execP2PNode() {
 		status.NodeInfo = stack.Server().NodeInfo()
 	}
 
+=======
+
+	// Start the node and gather startup report.
+	var status nodeStartupJSON
+	stack, stackErr := startExecNodeStack()
+	if stackErr != nil {
+		status.Err = stackErr.Error()
+	} else {
+		status.WSEndpoint = "ws://" + stack.WSEndpoint()
+		status.NodeInfo = stack.Server().NodeInfo()
+	}
+
+>>>>>>> upstream/master
 	// Send status to the host.
 	statusJSON, _ := json.Marshal(status)
 	if _, err := http.Post(statusURL, "application/json", bytes.NewReader(statusJSON)); err != nil {
@@ -403,9 +440,19 @@ func startExecNodeStack() (*node.Node, error) {
 	if err := json.Unmarshal([]byte(confEnv), &conf); err != nil {
 		return nil, fmt.Errorf("error decoding %s: %v", envNodeConfig, err)
 	}
+
+<<<<<<< HEAD
+=======
+	// create enode record
+	nodeTcpConn, _ := net.ResolveTCPAddr("tcp", conf.Stack.P2P.ListenAddr)
+	if nodeTcpConn.IP == nil {
+		nodeTcpConn.IP = net.IPv4(127, 0, 0, 1)
+	}
+	conf.Node.initEnode(nodeTcpConn.IP, nodeTcpConn.Port, nodeTcpConn.Port)
 	conf.Stack.P2P.PrivateKey = conf.Node.PrivateKey
 	conf.Stack.Logger = log.New("node.id", conf.Node.ID.String())
 
+>>>>>>> upstream/master
 	// initialize the devp2p stack
 	stack, err := node.New(&conf.Stack)
 	if err != nil {

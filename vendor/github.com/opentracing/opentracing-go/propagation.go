@@ -160,7 +160,11 @@ type HTTPHeadersCarrier http.Header
 // Set conforms to the TextMapWriter interface.
 func (c HTTPHeadersCarrier) Set(key, val string) {
 	h := http.Header(c)
+<<<<<<< HEAD
 	h.Add(key, val)
+=======
+	h.Set(key, val)
+>>>>>>> upstream/master
 }
 
 // ForeachKey conforms to the TextMapReader interface.

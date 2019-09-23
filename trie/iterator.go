@@ -21,8 +21,13 @@ import (
 	"container/heap"
 	"errors"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rlp"
+>>>>>>> upstream/master
 )
 
 // Iterator is a key-value trie iterator that traverses a Trie.
@@ -180,7 +185,11 @@ func (it *nodeIterator) LeafBlob() []byte {
 func (it *nodeIterator) LeafProof() [][]byte {
 	if len(it.stack) > 0 {
 		if _, ok := it.stack[len(it.stack)-1].node.(valueNode); ok {
+<<<<<<< HEAD
 			hasher := newHasher(0, 0, nil)
+=======
+			hasher := newHasher(nil)
+>>>>>>> upstream/master
 			defer returnHasherToPool(hasher)
 
 			proofs := make([][]byte, 0, len(it.stack))

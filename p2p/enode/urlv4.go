@@ -26,9 +26,15 @@ import (
 	"regexp"
 	"strconv"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/math"
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/p2p/enr"
+=======
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/p2p/enr"
+>>>>>>> upstream/master
 )
 
 var incompleteNodeURL = regexp.MustCompile("(?i)^(?:enode://)?([0-9a-f]+)$")
@@ -70,7 +76,11 @@ func ParseV4(rawurl string) (*Node, error) {
 	if m := incompleteNodeURL.FindStringSubmatch(rawurl); m != nil {
 		id, err := parsePubkey(m[1])
 		if err != nil {
+<<<<<<< HEAD
 			return nil, fmt.Errorf("invalid node ID (%v)", err)
+=======
+			return nil, fmt.Errorf("invalid public key (%v)", err)
+>>>>>>> upstream/master
 		}
 		return NewV4(id, nil, 0, 0), nil
 	}
@@ -81,7 +91,11 @@ func ParseV4(rawurl string) (*Node, error) {
 // contained in the node has a zero-length signature.
 func NewV4(pubkey *ecdsa.PublicKey, ip net.IP, tcp, udp int) *Node {
 	var r enr.Record
+<<<<<<< HEAD
 	if ip != nil {
+=======
+	if len(ip) > 0 {
+>>>>>>> upstream/master
 		r.Set(enr.IP(ip))
 	}
 	if udp != 0 {
@@ -98,6 +112,15 @@ func NewV4(pubkey *ecdsa.PublicKey, ip net.IP, tcp, udp int) *Node {
 	return n
 }
 
+<<<<<<< HEAD
+=======
+// isNewV4 returns true for nodes created by NewV4.
+func isNewV4(n *Node) bool {
+	var k s256raw
+	return n.r.IdentityScheme() == "" && n.r.Load(&k) == nil && len(n.r.Signature()) == 0
+}
+
+>>>>>>> upstream/master
 func parseComplete(rawurl string) (*Node, error) {
 	var (
 		id               *ecdsa.PublicKey
@@ -116,7 +139,11 @@ func parseComplete(rawurl string) (*Node, error) {
 		return nil, errors.New("does not contain node ID")
 	}
 	if id, err = parsePubkey(u.User.String()); err != nil {
+<<<<<<< HEAD
 		return nil, fmt.Errorf("invalid node ID (%v)", err)
+=======
+		return nil, fmt.Errorf("invalid public key (%v)", err)
+>>>>>>> upstream/master
 	}
 	// Parse the IP address.
 	host, port, err := net.SplitHostPort(u.Host)
@@ -126,10 +153,13 @@ func parseComplete(rawurl string) (*Node, error) {
 	if ip = net.ParseIP(host); ip == nil {
 		return nil, errors.New("invalid IP address")
 	}
+<<<<<<< HEAD
 	// Ensure the IP is 4 bytes long for IPv4 addresses.
 	if ipv4 := ip.To4(); ipv4 != nil {
 		ip = ipv4
 	}
+=======
+>>>>>>> upstream/master
 	// Parse the port numbers.
 	if tcpPort, err = strconv.ParseUint(port, 10, 16); err != nil {
 		return nil, errors.New("invalid port")
@@ -157,7 +187,11 @@ func parsePubkey(in string) (*ecdsa.PublicKey, error) {
 	return crypto.UnmarshalPubkey(b)
 }
 
+<<<<<<< HEAD
 func (n *Node) v4URL() string {
+=======
+func (n *Node) URLv4() string {
+>>>>>>> upstream/master
 	var (
 		scheme enr.ID
 		nodeid string

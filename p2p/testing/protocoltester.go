@@ -1,4 +1,4 @@
-// Copyright 2017 The go-ethereum Authors
+// Copyright 2018 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -25,13 +25,14 @@ package testing
 
 import (
 	"bytes"
+	"crypto/ecdsa"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
 	"sync"
-	"testing"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/node"
 	"github.com/Onther-Tech/go-ethereum/p2p"
@@ -40,6 +41,16 @@ import (
 	"github.com/Onther-Tech/go-ethereum/p2p/simulations/adapters"
 	"github.com/Onther-Tech/go-ethereum/rlp"
 	"github.com/Onther-Tech/go-ethereum/rpc"
+=======
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/simulations"
+	"github.com/ethereum/go-ethereum/p2p/simulations/adapters"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 )
 
 // ProtocolTester is the tester environment used for unit testing protocol
@@ -52,7 +63,11 @@ type ProtocolTester struct {
 // NewProtocolTester constructs a new ProtocolTester
 // it takes as argument the pivot node id, the number of dummy peers and the
 // protocol run function called on a peer connection by the p2p server
+<<<<<<< HEAD
 func NewProtocolTester(t *testing.T, id enode.ID, n int, run func(*p2p.Peer, p2p.MsgReadWriter) error) *ProtocolTester {
+=======
+func NewProtocolTester(prvkey *ecdsa.PrivateKey, nodeCount int, run func(*p2p.Peer, p2p.MsgReadWriter) error) *ProtocolTester {
+>>>>>>> upstream/master
 	services := adapters.Services{
 		"test": func(ctx *adapters.ServiceContext) (node.Service, error) {
 			return &testNode{run}, nil
@@ -63,23 +78,39 @@ func NewProtocolTester(t *testing.T, id enode.ID, n int, run func(*p2p.Peer, p2p
 	}
 	adapter := adapters.NewSimAdapter(services)
 	net := simulations.NewNetwork(adapter, &simulations.NetworkConfig{})
-	if _, err := net.NewNodeWithConfig(&adapters.NodeConfig{
-		ID:              id,
+	nodeConfig := &adapters.NodeConfig{
+		PrivateKey:      prvkey,
 		EnableMsgEvents: true,
 		Services:        []string{"test"},
-	}); err != nil {
+	}
+	if _, err := net.NewNodeWithConfig(nodeConfig); err != nil {
 		panic(err.Error())
 	}
-	if err := net.Start(id); err != nil {
+	if err := net.Start(nodeConfig.ID); err != nil {
 		panic(err.Error())
 	}
 
+<<<<<<< HEAD
 	node := net.GetNode(id).Node.(*adapters.SimNode)
 	peers := make([]*adapters.NodeConfig, n)
 	nodes := make([]*enode.Node, n)
 	for i := 0; i < n; i++ {
 		peers[i] = adapters.RandomNodeConfig()
 		peers[i].Services = []string{"mock"}
+=======
+	node := net.GetNode(nodeConfig.ID).Node.(*adapters.SimNode)
+	peers := make([]*adapters.NodeConfig, nodeCount)
+	nodes := make([]*enode.Node, nodeCount)
+	for i := 0; i < nodeCount; i++ {
+		peers[i] = adapters.RandomNodeConfig()
+		peers[i].Services = []string{"mock"}
+		if _, err := net.NewNodeWithConfig(peers[i]); err != nil {
+			panic(fmt.Sprintf("error initializing peer %v: %v", peers[i].ID, err))
+		}
+		if err := net.Start(peers[i].ID); err != nil {
+			panic(fmt.Sprintf("error starting peer %v: %v", peers[i].ID, err))
+		}
+>>>>>>> upstream/master
 		nodes[i] = peers[i].Node()
 	}
 	events := make(chan *p2p.PeerEvent, 1000)
@@ -95,21 +126,28 @@ func NewProtocolTester(t *testing.T, id enode.ID, n int, run func(*p2p.Peer, p2p
 		network:         net,
 	}
 
-	self.Connect(id, peers...)
+	self.Connect(nodeConfig.ID, peers...)
 
 	return self
 }
 
 // Stop stops the p2p server
+<<<<<<< HEAD
 func (t *ProtocolTester) Stop() error {
 	t.Server.Stop()
 	return nil
+=======
+func (t *ProtocolTester) Stop() {
+	t.Server.Stop()
+	t.network.Shutdown()
+>>>>>>> upstream/master
 }
 
 // Connect brings up the remote peer node and connects it using the
 // p2p/simulations network connection with the in memory network adapter
 func (t *ProtocolTester) Connect(selfID enode.ID, peers ...*adapters.NodeConfig) {
 	for _, peer := range peers {
+<<<<<<< HEAD
 		log.Trace(fmt.Sprintf("start node %v", peer.ID))
 		if _, err := t.network.NewNodeWithConfig(peer); err != nil {
 			panic(fmt.Sprintf("error starting peer %v: %v", peer.ID, err))
@@ -117,6 +155,8 @@ func (t *ProtocolTester) Connect(selfID enode.ID, peers ...*adapters.NodeConfig)
 		if err := t.network.Start(peer.ID); err != nil {
 			panic(fmt.Sprintf("error starting peer %v: %v", peer.ID, err))
 		}
+=======
+>>>>>>> upstream/master
 		log.Trace(fmt.Sprintf("connect to %v", peer.ID))
 		if err := t.network.Connect(selfID, peer.ID); err != nil {
 			panic(fmt.Sprintf("error connecting to peer %v: %v", peer.ID, err))

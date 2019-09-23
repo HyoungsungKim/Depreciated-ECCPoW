@@ -25,9 +25,15 @@ import (
 	"sync/atomic"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/event"
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/rlp"
+>>>>>>> upstream/master
 )
 
 // Msg defines the structure of a p2p message.
@@ -169,7 +175,7 @@ type MsgPipeRW struct {
 	closed  *int32
 }
 
-// WriteMsg sends a messsage on the pipe.
+// WriteMsg sends a message on the pipe.
 // It blocks until the receiver has consumed the message payload.
 func (p *MsgPipeRW) WriteMsg(msg Msg) error {
 	if atomic.LoadInt32(p.closed) == 0 {
@@ -252,19 +258,33 @@ func ExpectMsg(r MsgReader, code uint64, content interface{}) error {
 type msgEventer struct {
 	MsgReadWriter
 
+<<<<<<< HEAD
 	feed     *event.Feed
 	peerID   enode.ID
 	Protocol string
+=======
+	feed          *event.Feed
+	peerID        enode.ID
+	Protocol      string
+	localAddress  string
+	remoteAddress string
+>>>>>>> upstream/master
 }
 
 // newMsgEventer returns a msgEventer which sends message events to the given
 // feed
+<<<<<<< HEAD
 func newMsgEventer(rw MsgReadWriter, feed *event.Feed, peerID enode.ID, proto string) *msgEventer {
+=======
+func newMsgEventer(rw MsgReadWriter, feed *event.Feed, peerID enode.ID, proto, remote, local string) *msgEventer {
+>>>>>>> upstream/master
 	return &msgEventer{
 		MsgReadWriter: rw,
 		feed:          feed,
 		peerID:        peerID,
 		Protocol:      proto,
+		remoteAddress: remote,
+		localAddress:  local,
 	}
 }
 
@@ -276,11 +296,21 @@ func (ev *msgEventer) ReadMsg() (Msg, error) {
 		return msg, err
 	}
 	ev.feed.Send(&PeerEvent{
+<<<<<<< HEAD
 		Type:     PeerEventTypeMsgRecv,
 		Peer:     ev.peerID,
 		Protocol: ev.Protocol,
 		MsgCode:  &msg.Code,
 		MsgSize:  &msg.Size,
+=======
+		Type:          PeerEventTypeMsgRecv,
+		Peer:          ev.peerID,
+		Protocol:      ev.Protocol,
+		MsgCode:       &msg.Code,
+		MsgSize:       &msg.Size,
+		LocalAddress:  ev.localAddress,
+		RemoteAddress: ev.remoteAddress,
+>>>>>>> upstream/master
 	})
 	return msg, nil
 }
@@ -293,11 +323,21 @@ func (ev *msgEventer) WriteMsg(msg Msg) error {
 		return err
 	}
 	ev.feed.Send(&PeerEvent{
+<<<<<<< HEAD
 		Type:     PeerEventTypeMsgSend,
 		Peer:     ev.peerID,
 		Protocol: ev.Protocol,
 		MsgCode:  &msg.Code,
 		MsgSize:  &msg.Size,
+=======
+		Type:          PeerEventTypeMsgSend,
+		Peer:          ev.peerID,
+		Protocol:      ev.Protocol,
+		MsgCode:       &msg.Code,
+		MsgSize:       &msg.Size,
+		LocalAddress:  ev.localAddress,
+		RemoteAddress: ev.remoteAddress,
+>>>>>>> upstream/master
 	})
 	return nil
 }

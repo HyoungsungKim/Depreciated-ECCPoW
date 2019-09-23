@@ -20,14 +20,21 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common/hexutil"
 	"github.com/Onther-Tech/go-ethereum/crypto"
 	"github.com/Onther-Tech/go-ethereum/metrics"
 	"github.com/Onther-Tech/go-ethereum/p2p"
 	"github.com/Onther-Tech/go-ethereum/p2p/enode"
 	"github.com/Onther-Tech/go-ethereum/rpc"
+=======
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/rpc"
+>>>>>>> upstream/master
 )
 
 // PrivateAdminAPI is the collection of administrative API methods exposed only
@@ -51,7 +58,11 @@ func (api *PrivateAdminAPI) AddPeer(url string) (bool, error) {
 		return false, ErrNodeStopped
 	}
 	// Try to add the url as a static peer and return
+<<<<<<< HEAD
 	node, err := enode.ParseV4(url)
+=======
+	node, err := enode.Parse(enode.ValidSchemes, url)
+>>>>>>> upstream/master
 	if err != nil {
 		return false, fmt.Errorf("invalid enode: %v", err)
 	}
@@ -67,7 +78,11 @@ func (api *PrivateAdminAPI) RemovePeer(url string) (bool, error) {
 		return false, ErrNodeStopped
 	}
 	// Try to remove the url as a static peer and return
+<<<<<<< HEAD
 	node, err := enode.ParseV4(url)
+=======
+	node, err := enode.Parse(enode.ValidSchemes, url)
+>>>>>>> upstream/master
 	if err != nil {
 		return false, fmt.Errorf("invalid enode: %v", err)
 	}
@@ -82,7 +97,11 @@ func (api *PrivateAdminAPI) AddTrustedPeer(url string) (bool, error) {
 	if server == nil {
 		return false, ErrNodeStopped
 	}
+<<<<<<< HEAD
 	node, err := enode.ParseV4(url)
+=======
+	node, err := enode.Parse(enode.ValidSchemes, url)
+>>>>>>> upstream/master
 	if err != nil {
 		return false, fmt.Errorf("invalid enode: %v", err)
 	}
@@ -98,7 +117,11 @@ func (api *PrivateAdminAPI) RemoveTrustedPeer(url string) (bool, error) {
 	if server == nil {
 		return false, ErrNodeStopped
 	}
+<<<<<<< HEAD
 	node, err := enode.ParseV4(url)
+=======
+	node, err := enode.Parse(enode.ValidSchemes, url)
+>>>>>>> upstream/master
 	if err != nil {
 		return false, fmt.Errorf("invalid enode: %v", err)
 	}
@@ -297,6 +320,7 @@ func (api *PublicAdminAPI) Datadir() string {
 	return api.node.DataDir()
 }
 
+<<<<<<< HEAD
 // PublicDebugAPI is the collection of debugging related API methods exposed over
 // both secure and unsecure RPC channels.
 type PublicDebugAPI struct {
@@ -442,6 +466,8 @@ func (api *PublicDebugAPI) Metrics(raw bool) (map[string]interface{}, error) {
 	return counters, nil
 }
 
+=======
+>>>>>>> upstream/master
 // PublicWeb3API offers helper utils
 type PublicWeb3API struct {
 	stack *Node

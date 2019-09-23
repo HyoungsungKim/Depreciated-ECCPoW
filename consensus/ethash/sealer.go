@@ -29,11 +29,29 @@ import (
 	"sync"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/common/hexutil"
 	"github.com/Onther-Tech/go-ethereum/consensus"
 	"github.com/Onther-Tech/go-ethereum/core/types"
 	"github.com/Onther-Tech/go-ethereum/log"
+)
+
+const (
+	// staleThreshold is the maximum depth of the acceptable stale but valid ethash solution.
+	staleThreshold = 7
+)
+
+var (
+	errNoMiningWork      = errors.New("no mining work available yet")
+	errInvalidSealResult = errors.New("invalid or stale proof-of-work solution")
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
+>>>>>>> upstream/master
 )
 
 const (
@@ -270,7 +288,11 @@ func (ethash *Ethash) remote(notify []string, noverify bool) {
 		start := time.Now()
 		if !noverify {
 			if err := ethash.verifySeal(nil, header, true); err != nil {
+<<<<<<< HEAD
 				log.Warn("Invalid proof-of-work submitted", "sealhash", sealhash, "elapsed", time.Since(start), "err", err)
+=======
+				log.Warn("Invalid proof-of-work submitted", "sealhash", sealhash, "elapsed", common.PrettyDuration(time.Since(start)), "err", err)
+>>>>>>> upstream/master
 				return false
 			}
 		}
@@ -279,7 +301,11 @@ func (ethash *Ethash) remote(notify []string, noverify bool) {
 			log.Warn("Ethash result channel is empty, submitted mining result is rejected")
 			return false
 		}
+<<<<<<< HEAD
 		log.Trace("Verified correct proof-of-work", "sealhash", sealhash, "elapsed", time.Since(start))
+=======
+		log.Trace("Verified correct proof-of-work", "sealhash", sealhash, "elapsed", common.PrettyDuration(time.Since(start)))
+>>>>>>> upstream/master
 
 		// Solutions seems to be valid, return to the miner and notify acceptance.
 		solution := block.WithSeal(header)

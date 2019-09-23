@@ -24,7 +24,11 @@ import (
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/rlp"
+=======
+	"github.com/ethereum/go-ethereum/rlp"
+>>>>>>> upstream/master
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -49,16 +53,26 @@ func TestGetSetID(t *testing.T) {
 }
 
 // TestGetSetIP4 tests encoding/decoding and setting/getting of the IP key.
+<<<<<<< HEAD
 func TestGetSetIP4(t *testing.T) {
 	ip := IP{192, 168, 0, 3}
 	var r Record
 	r.Set(ip)
 
 	var ip2 IP
+=======
+func TestGetSetIPv4(t *testing.T) {
+	ip := IPv4{192, 168, 0, 3}
+	var r Record
+	r.Set(ip)
+
+	var ip2 IPv4
+>>>>>>> upstream/master
 	require.NoError(t, r.Load(&ip2))
 	assert.Equal(t, ip, ip2)
 }
 
+<<<<<<< HEAD
 // TestGetSetIP6 tests encoding/decoding and setting/getting of the IP key.
 func TestGetSetIP6(t *testing.T) {
 	ip := IP{0x20, 0x01, 0x48, 0x60, 0, 0, 0x20, 0x01, 0, 0, 0, 0, 0, 0, 0x00, 0x68}
@@ -66,11 +80,24 @@ func TestGetSetIP6(t *testing.T) {
 	r.Set(ip)
 
 	var ip2 IP
+=======
+// TestGetSetIP6 tests encoding/decoding and setting/getting of the IP6 key.
+func TestGetSetIPv6(t *testing.T) {
+	ip := IPv6{0x20, 0x01, 0x48, 0x60, 0, 0, 0x20, 0x01, 0, 0, 0, 0, 0, 0, 0x00, 0x68}
+	var r Record
+	r.Set(ip)
+
+	var ip2 IPv6
+>>>>>>> upstream/master
 	require.NoError(t, r.Load(&ip2))
 	assert.Equal(t, ip, ip2)
 }
 
+<<<<<<< HEAD
 // TestGetSetDiscPort tests encoding/decoding and setting/getting of the DiscPort key.
+=======
+// TestGetSetUDP tests encoding/decoding and setting/getting of the UDP key.
+>>>>>>> upstream/master
 func TestGetSetUDP(t *testing.T) {
 	port := UDP(30309)
 	var r Record
@@ -83,7 +110,11 @@ func TestGetSetUDP(t *testing.T) {
 
 func TestLoadErrors(t *testing.T) {
 	var r Record
+<<<<<<< HEAD
 	ip4 := IP{127, 0, 0, 1}
+=======
+	ip4 := IPv4{127, 0, 0, 1}
+>>>>>>> upstream/master
 	r.Set(ip4)
 
 	// Check error for missing keys.
@@ -185,6 +216,7 @@ func TestSeq(t *testing.T) {
 func TestGetSetOverwrite(t *testing.T) {
 	var r Record
 
+<<<<<<< HEAD
 	ip := IP{192, 168, 0, 3}
 	r.Set(ip)
 
@@ -192,6 +224,15 @@ func TestGetSetOverwrite(t *testing.T) {
 	r.Set(ip2)
 
 	var ip3 IP
+=======
+	ip := IPv4{192, 168, 0, 3}
+	r.Set(ip)
+
+	ip2 := IPv4{192, 168, 0, 4}
+	r.Set(ip2)
+
+	var ip3 IPv4
+>>>>>>> upstream/master
 	require.NoError(t, r.Load(&ip3))
 	assert.Equal(t, ip2, ip3)
 }
@@ -200,7 +241,11 @@ func TestGetSetOverwrite(t *testing.T) {
 func TestSignEncodeAndDecode(t *testing.T) {
 	var r Record
 	r.Set(UDP(30303))
+<<<<<<< HEAD
 	r.Set(IP{127, 0, 0, 1})
+=======
+	r.Set(IPv4{127, 0, 0, 1})
+>>>>>>> upstream/master
 	require.NoError(t, signTest([]byte{5}, &r))
 
 	blob, err := rlp.EncodeToBytes(r)

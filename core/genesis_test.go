@@ -22,12 +22,21 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+<<<<<<< HEAD
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/consensus/ethash"
 	"github.com/Onther-Tech/go-ethereum/core/rawdb"
 	"github.com/Onther-Tech/go-ethereum/core/vm"
 	"github.com/Onther-Tech/go-ethereum/ethdb"
 	"github.com/Onther-Tech/go-ethereum/params"
+=======
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/params"
+>>>>>>> upstream/master
 )
 
 func TestDefaultGenesisBlock(t *testing.T) {
@@ -141,7 +150,11 @@ func TestSetupGenesis(t *testing.T) {
 	}
 
 	for _, test := range tests {
+<<<<<<< HEAD
 		db := ethdb.NewMemDatabase()
+=======
+		db := rawdb.NewMemoryDatabase()
+>>>>>>> upstream/master
 		config, hash, err := test.fn(db)
 		// Check the return values.
 		if !reflect.DeepEqual(err, test.wantErr) {
