@@ -18,13 +18,14 @@ package miner
 
 import (
 	"bytes"
+	"encoding/csv"
 	"errors"
 	"math/big"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	mapset "github.com/deckarep/golang-set"
 	"github.com/Onther-Tech/go-ethereum/common"
 	"github.com/Onther-Tech/go-ethereum/consensus"
 	"github.com/Onther-Tech/go-ethereum/consensus/misc"
@@ -34,6 +35,7 @@ import (
 	"github.com/Onther-Tech/go-ethereum/event"
 	"github.com/Onther-Tech/go-ethereum/log"
 	"github.com/Onther-Tech/go-ethereum/params"
+	mapset "github.com/deckarep/golang-set"
 )
 
 const (
@@ -596,6 +598,12 @@ func (w *worker) resultLoop() {
 			}
 			log.Info("Successfully sealed new block", "number", block.Number(), "sealhash", sealhash, "hash", hash,
 				"elapsed", common.PrettyDuration(time.Since(task.createdAt)))
+
+			csvFile, _ := os.OpenFile("elapseTime.csv", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+
+			wr := csv.NewWriter(csvFile)
+			wr.Write([]string{block.Number().String(), time.Since(task.createdAt).String()})
+			wr.Flush()
 
 			// Broadcast the block and announce chain insertion event
 			w.mux.Post(core.NewMinedBlockEvent{Block: block})
