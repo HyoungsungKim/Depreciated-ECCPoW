@@ -27,10 +27,10 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/bitutil"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/Onther-Tech/go-ethereum/common"
+	"github.com/Onther-Tech/go-ethereum/common/bitutil"
+	"github.com/Onther-Tech/go-ethereum/crypto"
+	"github.com/Onther-Tech/go-ethereum/log"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -368,7 +368,25 @@ func hashimoto(hash []byte, nonce uint64, size uint64, lookup func(index uint32)
 	for i, val := range mix {
 		binary.LittleEndian.PutUint32(digest[i*4:], val)
 	}
-	return digest, crypto.Keccak256(append(seed, digest...))
+
+	parameters := setParameters(hash)
+	H := generateH(parameters)
+	colInRow, rowInCol := generateQ(parameters, H)
+
+	hashVector := generateHv(parameters, seed)
+	_, outputWord, _ := OptimizedDecoding(parameters, hashVector, H, rowInCol, colInRow)
+
+	var byteOutputWord []byte
+	for i := range outputWord {
+		if outputWord[i] == 0 {
+			byteOutputWord = append(byteOutputWord, 0)
+		} else {
+			byteOutputWord = append(byteOutputWord, 1)
+		}
+	}
+
+	return digest, crypto.Keccak256(append(byteOutputWord, append(seed, digest...)...))
+	//return digest, crypto.Keccak256(append(seed, digest...))
 }
 
 // hashimotoLight aggregates data from the full dataset (using only a small

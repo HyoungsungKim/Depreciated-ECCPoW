@@ -21,18 +21,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/clique"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/Onther-Tech/go-ethereum/common"
+	"github.com/Onther-Tech/go-ethereum/consensus"
+	"github.com/Onther-Tech/go-ethereum/consensus/clique"
+	"github.com/Onther-Tech/go-ethereum/consensus/ethash"
+	"github.com/Onther-Tech/go-ethereum/core"
+	"github.com/Onther-Tech/go-ethereum/core/rawdb"
+	"github.com/Onther-Tech/go-ethereum/core/types"
+	"github.com/Onther-Tech/go-ethereum/core/vm"
+	"github.com/Onther-Tech/go-ethereum/crypto"
+	"github.com/Onther-Tech/go-ethereum/ethdb"
+	"github.com/Onther-Tech/go-ethereum/event"
+	"github.com/Onther-Tech/go-ethereum/params"
 )
 
 var (
@@ -95,7 +95,7 @@ func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine 
 
 	switch engine.(type) {
 	case *clique.Clique:
-		gspec.ExtraData = make([]byte, 32+common.AddressLength+65)
+		gspec.ExtraData = make([]byte, 32+common.AddressLength+crypto.SignatureLength)
 		copy(gspec.ExtraData[32:], testBankAddress[:])
 	case *ethash.Ethash:
 	default:

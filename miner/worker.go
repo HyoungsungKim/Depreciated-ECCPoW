@@ -24,16 +24,16 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/Onther-Tech/go-ethereum/common"
+	"github.com/Onther-Tech/go-ethereum/consensus"
+	"github.com/Onther-Tech/go-ethereum/consensus/misc"
+	"github.com/Onther-Tech/go-ethereum/core"
+	"github.com/Onther-Tech/go-ethereum/core/state"
+	"github.com/Onther-Tech/go-ethereum/core/types"
+	"github.com/Onther-Tech/go-ethereum/event"
+	"github.com/Onther-Tech/go-ethereum/log"
+	"github.com/Onther-Tech/go-ethereum/params"
 	mapset "github.com/deckarep/golang-set"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 )
 
 const (
@@ -597,6 +597,13 @@ func (w *worker) resultLoop() {
 			log.Info("Successfully sealed new block", "number", block.Number(), "sealhash", sealhash, "hash", hash,
 				"elapsed", common.PrettyDuration(time.Since(task.createdAt)))
 
+			/*
+				csvFile, _ := os.OpenFile("elapseTime.csv", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+
+				wr := csv.NewWriter(csvFile)
+				wr.Write([]string{block.Number().String(), time.Since(task.createdAt).String()})
+				wr.Flush()
+			*/
 			// Broadcast the block and announce chain insertion event
 			w.mux.Post(core.NewMinedBlockEvent{Block: block})
 
